@@ -462,7 +462,7 @@
               <div style="color:#7cc576; font-weight:700; font-size:12px; margin-bottom:6px;">내 제안 <span id="tradeMyConfirmedBadge"></span></div>
               <div style="margin-bottom:8px;">
                 <label style="font-size:11px; color:var(--ink-dim);">골드</label>
-                <input type="number" id="tradeMyGoldInput" min="0" value="0" style="width:100%; box-sizing:border-box;">
+                <input type="number" id="tradeMyGoldInput" min="0" value="0" style="width:100%; box-sizing:border-box; font-size:16px;">
               </div>
               <div style="color:var(--ink-dim); font-size:11px; margin-bottom:4px;">추가할 아이템</div>
               <select id="tradeAddItemSelect" style="width:100%; font-size:11px; margin-bottom:6px;"></select>
@@ -565,9 +565,9 @@
       <div id="mpPanel" class="hidden" style="position:absolute; top:52px; right:96px; width:260px; max-width:85vw; background:rgba(10,10,16,.94); border:1px solid var(--line); border-radius:10px; padding:12px; pointer-events:all; font-size:12px; display:flex; flex-direction:column; gap:8px;">
         <div style="color:var(--gold); font-weight:700;">🌐 멀티플레이 연결</div>
         <div id="mpDisconnectedView" style="display:flex; flex-direction:column; gap:6px;">
-          <input id="mpServerUrl" type="text" placeholder="서버 주소 (예: https://xxx.onrender.com)" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:11px;">
-          <input id="mpRoomCode" type="text" placeholder="방 코드 (친구들과 동일하게)" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:11px;">
-          <input id="mpNickname" type="text" placeholder="닉네임" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:11px;">
+          <input id="mpServerUrl" type="text" placeholder="서버 주소 (예: https://xxx.onrender.com)" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:16px;">
+          <input id="mpRoomCode" type="text" placeholder="방 코드 (친구들과 동일하게)" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:16px;">
+          <input id="mpNickname" type="text" placeholder="닉네임" style="padding:6px; border-radius:6px; border:1px solid var(--line); background:#111; color:#eee; font-size:16px;">
           <button class="btn small" id="mpConnectBtn" style="width:100%;">연결하기</button>
           <div id="mpStatus" style="color:var(--ink-dim); font-size:11px;"></div>
         </div>
@@ -578,7 +578,7 @@
         </div>
       </div>
       <div id="mpChatBox" class="hidden" style="position:absolute; bottom:180px; right:14px; width:220px; max-height:140px; overflow-y:auto; background:rgba(10,10,16,.8); border:1px solid var(--line); border-radius:8px; padding:8px; font-size:11px; pointer-events:none; color:#ddd; line-height:1.5;"></div>
-      <input id="mpChatInput" class="hidden" type="text" placeholder="Enter로 채팅 입력" style="position:absolute; bottom:150px; right:14px; width:220px; padding:6px; border-radius:6px; border:1px solid var(--line); background:rgba(10,10,16,.85); color:#eee; font-size:11px; pointer-events:all;">
+      <input id="mpChatInput" class="hidden" type="text" placeholder="Enter로 채팅 입력" style="position:absolute; bottom:150px; right:14px; width:220px; padding:6px; border-radius:6px; border:1px solid var(--line); background:rgba(10,10,16,.85); color:#eee; font-size:16px; pointer-events:all;">
       <div id="hint">이동: WASD / 방향키&nbsp;&nbsp;공격: SPACE&nbsp;&nbsp;스킬: Q, E&nbsp;&nbsp;마법서: Z&nbsp;&nbsp;각성: R&nbsp;&nbsp;재장전: T&nbsp;&nbsp;음식 취식: V&nbsp;&nbsp;물약: B&nbsp;&nbsp;해커 치트창: X&nbsp;&nbsp;포탈 상호작용: F&nbsp;&nbsp;직업창: C&nbsp;&nbsp;인벤토리: I&nbsp;&nbsp;마을: M</div>
 
       <div id="joyBase" class="hidden"><div id="joyKnob"></div></div>
