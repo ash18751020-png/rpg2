@@ -6643,6 +6643,11 @@ function trySkill(slot){
   refreshHUD();
 }
 
+function trackDamageContribution(target, dmg){
+  if(!target.damageContributions) target.damageContributions = {};
+  const myId = (mpConnected && mpSelfId) ? mpSelfId : 'self';
+  target.damageContributions[myId] = (target.damageContributions[myId]||0) + dmg;
+}
 function dealDamage(target, dmg, isSkill, skillName){
   dmg = Math.max(1,dmg);
   if(target.invulnUntil && performance.now()/1000 < target.invulnUntil){
@@ -6662,10 +6667,11 @@ function dealDamage(target, dmg, isSkill, skillName){
     // 기절 상태의 보스를 다시 타격 -> 확정 사망
     target.hp = 0;
     target.bossStunned = false;
+    trackDamageContribution(target, dmg);
     spawnFloatText(target.x, target.y-46, `-${dmg}`, isSkill?'#ffd35c':'#fff');
     if(target.alive){ target.alive=false; onEnemyKilled(target); }
     if(mpConnected && target.netId && currentZone){
-      mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive });
+      mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive, attackerId: mpSelfId, dmgDealt: dmg });
     }
     return;
   }
@@ -6675,30 +6681,33 @@ function dealDamage(target, dmg, isSkill, skillName){
     target.bossStunUntil = performance.now()/1000 + 5;
     target.hp = 1;
     target.stunnedUntil = performance.now()/1000 + 5;
+    trackDamageContribution(target, dmg);
     spawnFloatText(target.x, target.y-60, '치명타! 보스 기절 (5초, 포획 가능)', '#ffd35c');
     if(mpConnected && target.netId && currentZone){
-      mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive });
+      mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive, attackerId: mpSelfId, dmgDealt: dmg });
     }
     return;
   }
   target.hp -= dmg;
+  trackDamageContribution(target, dmg);
   spawnFloatText(target.x, target.y-46, `-${dmg}`, isSkill?'#ffd35c':'#fff');
   if(target.hp<=0 && target.alive){
     target.alive=false;
     onEnemyKilled(target);
   }
   if(mpConnected && target.netId && currentZone){
-    mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive });
+    mpSocket.emit('monsterDamage', { zone: currentZone.id, netId: target.netId, hp: target.hp, alive: target.alive, attackerId: mpSelfId, dmgDealt: dmg });
   }
 }
 
 function onEnemyKilled(target){
   if(target.kind==='boss' && target.t && target.t.name==='제천대성'){
     // 특수: 죽지 않고 근두운을 타고 도망침
-    gainExp(Math.round((target.expReward||0)*0.5));
+    grantExpByContribution(target, Math.round((target.expReward||0)*0.5));
     const deathX = target.x, deathY = target.y;
     target.hp = target.hpMax;
     target.alive = true;
+    target.damageContributions = {};
     const ang = Math.random()*Math.PI*2;
     const cx = currentZone.size.w/2, cy = currentZone.size.h/2;
     target.x = Math.max(80, Math.min(currentZone.size.w-80, cx + Math.cos(ang)*700));
@@ -6725,7 +6734,7 @@ function onEnemyKilled(target){
     return;
   }
   const exp = target.kind==='boss' ? target.expReward : Math.round(target.t.exp);
-  gainExp(exp);
+  grantExpByContribution(target, exp);
   const nowT = performance.now()/1000;
   if(player.classId==='swordsman'){
     const gain = target.kind==='boss' ? 10 : 1;
@@ -6860,6 +6869,23 @@ function openHiddenSelect(){
 }
 document.getElementById('hiddenAdvanceBtn').onclick = ()=> openHiddenSelect();
 
+const EXP_SHARE_THRESHOLD = 0.10;
+function grantExpByContribution(target, exp){
+  const contributions = target.damageContributions || {};
+  const hpMax = target.hpMax || 1;
+  const myId = (mpConnected && mpSelfId) ? mpSelfId : 'self';
+  const myContribution = contributions[myId] || 0;
+  const totalTracked = Object.values(contributions).reduce((a,b)=>a+b,0);
+  if(myContribution >= hpMax*EXP_SHARE_THRESHOLD || totalTracked<=0){
+    gainExp(exp);
+  }
+  if(mpConnected && currentZone){
+    const qualifiedIds = Object.keys(contributions).filter(id => id!==myId && contributions[id] >= hpMax*EXP_SHARE_THRESHOLD);
+    if(qualifiedIds.length>0){
+      mpSocket.emit('expShare', { qualifiedIds, exp });
+    }
+  }
+}
 function gainExp(exp){
   player.exp += exp;
   spawnFloatText(player.x, player.y-70, `+${exp} EXP`, '#8fe08f');
@@ -7043,6 +7069,21 @@ function buildEntitiesFromNet(zone, netList){
       });
     }
   });
+  // 정적 포탈/NPC는 네트워크 동기화 대상이 아니므로(전투 상태가 없음) 로컬에서 다시 배치
+  if(zone.id==='plains'){
+    entities.push({
+      kind:'portal', isSecret:true, targetZone:'huaguoshan',
+      x:SECRET_PORTAL_POS.x, y:SECRET_PORTAL_POS.y, alive:true,
+      home:{x:SECRET_PORTAL_POS.x, y:SECRET_PORTAL_POS.y},
+    });
+  }
+  if(zone.id==='farm'){
+    entities.push({
+      kind:'portal', isFarmerNPC:true,
+      x:FARMER_NPC_POS.x, y:FARMER_NPC_POS.y, alive:true,
+      home:{x:FARMER_NPC_POS.x, y:FARMER_NPC_POS.y},
+    });
+  }
 }
 
 function mpConnect(){
@@ -7093,10 +7134,22 @@ function mpConnect(){
       }
     }catch(e){ console.error('존 엔티티 수신 처리 실패:', e); }
   });
-  mpSocket.on('monsterDamage', ({zone, netId, hp, alive})=>{
+  mpSocket.on('monsterDamage', ({zone, netId, hp, alive, attackerId, dmgDealt})=>{
     if(!currentZone || currentZone.id!==zone) return;
     const en = entities.find(e=>e.netId===netId);
-    if(en){ en.hp = hp; if(en.alive && !alive) en.alive=false; }
+    if(en){
+      en.hp = hp;
+      if(attackerId && dmgDealt){
+        if(!en.damageContributions) en.damageContributions = {};
+        en.damageContributions[attackerId] = (en.damageContributions[attackerId]||0) + dmgDealt;
+      }
+      if(en.alive && !alive){
+        en.alive = false;
+        if(en.kind==='mob' && en.respawnAt==null){
+          en.respawnAt = performance.now()/1000 + (8 + Math.random()*10);
+        }
+      }
+    }
   });
   mpSocket.on('monsterRespawn', ({zone, netId, x, y, hp, hpMax})=>{
     if(!currentZone || currentZone.id!==zone) return;
@@ -7109,6 +7162,11 @@ function mpConnect(){
     const dist = Math.hypot(player.x-data.x, player.y-data.y);
     if(dist > PARTY_BUFF_RADIUS) return;
     applyIncomingPartyBuff(data.type, data.amount, data.dur);
+  });
+  mpSocket.on('expShareReceived', ({exp})=>{
+    if(!player || player.hp<=0 || !exp) return;
+    gainExp(exp);
+    spawnFloatText(player.x, player.y-60, `+${exp} EXP (기여 보상)`, '#ffd35c');
   });
   mpSocket.on('tradeRequestReceived', ({fromId, fromName})=>{
     if(player.currentTradeId){ mpSocket.emit('tradeResponse', {targetId:fromId, accepted:false}); return; }
