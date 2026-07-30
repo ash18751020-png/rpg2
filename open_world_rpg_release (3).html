@@ -839,6 +839,7 @@
         <div id="mbPotion" class="mbtn-inner">🧪</div>
         <div id="mbOxygen" class="mbtn-inner">🫧</div>
         <div id="mbMount" class="mbtn-inner">🐴</div>
+        <div id="mbMap" class="mbtn-inner">🗺️</div>
         <div id="mbInventory" class="mbtn-inner">🎒</div>
         <div id="mbHackerCheat" class="mbtn-inner hidden">💻</div>
       </div>
@@ -10436,6 +10437,10 @@ bindMobileButton('mbPotion', ()=> tryUsePotion());
 bindMobileButton('mbHackerCheat', ()=> toggleHackerCheatPanel());
 bindMobileButton('mbOxygen', ()=> useOxygenTank());
 bindMobileButton('mbMount', ()=> toggleMount());
+bindMobileButton('mbMap', ()=>{
+  const overlay = document.getElementById('mapOverlay');
+  if(overlay.classList.contains('hidden')) openMapOverlay(false); else closeMapOverlay();
+});
 bindMobileButton('mbInventory', ()=>{
   const overlay = document.getElementById('inventoryOverlay');
   if(overlay.classList.contains('hidden')) openInventory();
