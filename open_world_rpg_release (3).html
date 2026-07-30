@@ -6114,7 +6114,7 @@ function reviveMob(en){
   }
   en.home = {x:en.x, y:en.y};
   if(mpConnected && en.netId && currentZone){
-    mpSocket.emit('monsterRespawn', { zone: currentZone.id, netId: en.netId, x: en.x, y: en.y, hp: en.hp, hpMax: en.hpMax });
+    mpSocket.emit('monsterRespawn', { zone: currentZone.id, netId: en.netId, x: en.x, y: en.y, hp: en.hp, hpMax: en.hpMax, respawnAt: null });
   }
 }
 const FOG_CELL_SIZE = 150;
@@ -6177,17 +6177,23 @@ function tickBossRespawn(){
           phase2Def:b.phase2||null, phase2Triggered:false,
           baseAtk:b.atkBase, baseSpd:95, telegraphData:null,
         });
+        if(mpConnected && existingDead.netId && currentZone){
+          mpSocket.emit('monsterRespawn', { zone: currentZone.id, netId: existingDead.netId, x: bx, y: by, hp: existingDead.hp, hpMax: existingDead.hpMax });
+        }
       } else {
         entities.push({
           kind:'boss', typeKey:'boss', t:{name:b.name, icon:b.icon}, isMapBoss:true,
           x:bx, y:by, hpMax:b.hpBase, hp:b.hpBase, atk:b.atkBase, def:b.defBase||0,
           spd:95, size:b.size, alive:true, attackCd:0, state:'idle', wanderT:0,
-          expReward:b.exp, home:{x:bx,y:by},
+          expReward:b.exp, home:{x:bx,y:by}, netId: currentZone.id+'_mapboss',
           patterns:(b.patterns||[]).map(p=>({...p})),
           patternReady:(b.patterns||[]).map(()=>3+Math.random()*3),
           phase2Def:b.phase2||null, phase2Triggered:false,
           baseAtk:b.atkBase, baseSpd:95,
         });
+        if(mpConnected && currentZone){
+          mpSocket.emit('monsterRespawn', { zone: currentZone.id, netId: currentZone.id+'_mapboss', x: bx, y: by, hp: b.hpBase, hpMax: b.hpBase });
+        }
       }
       usedSkillSinceBossSpawn = false;
       spawnFloatText(bx, by-100, `${b.icon} ${b.name} 부활!`, '#ff5c6b');
@@ -6590,7 +6596,7 @@ function spawnZoneEntities(zone){
         const hp = Math.round((40 + subLvl*9) * t.hpM * subMm);
         const ang = Math.random()*Math.PI*2, r = Math.sqrt(Math.random())*sub.radius;
         entities.push({
-          kind:'mob', typeKey, t,
+          kind:'mob', typeKey, t, subareaId: sub.id,
           x: sub.center.x + Math.cos(ang)*r,
           y: sub.center.y + Math.sin(ang)*r,
           hpMax: hp, hp: hp,
@@ -7363,6 +7369,7 @@ function update(dt){
   }
   updateSpirits(dt);
   entities.forEach(en=>{
+   try{
     if(en.kind==='portal') return; // 포탈은 전투 AI 대상 아님
     if(en.kind==='resource'){
       if(!en.alive && en.respawnAt!=null && nowT>=en.respawnAt){
@@ -7499,6 +7506,7 @@ function update(dt){
       const wdx=tx-en.x, wdy=ty-en.y, wd=Math.hypot(wdx,wdy);
       if(wd>4){ en.x += (wdx/wd)*effSpd*0.3*dt; en.y += (wdy/wd)*effSpd*0.3*dt; }
     }
+   }catch(e){ console.error('엔티티 AI 처리 중 오류 (이 엔티티만 건너뜀):', en && en.t && en.t.name, e); }
   });
 
   refreshHUD();
@@ -9539,11 +9547,14 @@ function buildEntitiesFromNet(zone, netList){
     if(net.kind==='mob'){
       const t = MTYPES[net.typeKey];
       if(!t) return;
+      const sub = (zone.subareas && net.subareaId) ? zone.subareas.find(s=>s.id===net.subareaId) : null;
+      const subLvl = sub && sub.lvlGuess!=null ? sub.lvlGuess : lvlGuess;
+      const subMm = sub && sub.mobMult!=null ? sub.mobMult : mm;
       entities.push({
-        kind:'mob', typeKey:net.typeKey, t, netId:net.netId,
+        kind:'mob', typeKey:net.typeKey, t, netId:net.netId, subareaId: net.subareaId||null,
         x:net.x, y:net.y, hpMax:net.hpMax, hp:net.hp,
-        atk: Math.round((6+lvlGuess*1.6)*t.atkM*mm),
-        def: Math.round((3+lvlGuess*0.9)*(t.defM||1)*mm),
+        atk: Math.round((6+subLvl*1.6)*t.atkM*subMm),
+        def: Math.round((3+subLvl*0.9)*(t.defM||1)*subMm),
         spd: t.spd, alive:net.alive, attackCd:0, home:{x:net.x,y:net.y}, state:'idle',
         wanderT: Math.random()*3, respawnAt: net.respawnAt!=null ? net.respawnAt : null,
         pattern: t.pattern||null, specialCd: t.pattern?(t.pattern.cd*0.5):Infinity,
@@ -9671,8 +9682,23 @@ function mpConnect(){
       }
       if(en.alive && !alive){
         en.alive = false;
-        if((en.kind==='mob' || (en.kind==='boss' && en.isFieldBoss)) && en.respawnAt==null){
+        if(en.kind==='mob' && en.respawnAt==null){
           en.respawnAt = performance.now()/1000 + (8 + Math.random()*10);
+        }
+        if(en.kind==='boss' && en.isFieldBoss && en.respawnAt==null){
+          en.respawnAt = performance.now()/1000 + (90 + Math.random()*60);
+        }
+        if(en.kind==='boss' && en.isMapBoss && zoneState[zone]){
+          zoneState[zone].bossDefeated = true;
+          if(zoneState[zone].bossRespawnAt==null){
+            zoneState[zone].bossRespawnAt = performance.now()/1000 + (240 + Math.random()*120);
+          }
+        }
+        if(en.kind==='boss' && en.isFieldBoss && en.subareaId && zoneState[zone]){
+          if(!zoneState[zone].fieldBossRespawnAt) zoneState[zone].fieldBossRespawnAt = {};
+          if(zoneState[zone].fieldBossRespawnAt[en.subareaId]==null){
+            zoneState[zone].fieldBossRespawnAt[en.subareaId] = en.respawnAt;
+          }
         }
       }
     }
@@ -9680,7 +9706,13 @@ function mpConnect(){
   mpSocket.on('monsterRespawn', ({zone, netId, x, y, hp, hpMax})=>{
     if(!currentZone || currentZone.id!==zone) return;
     const en = entities.find(e=>e.netId===netId);
-    if(en){ en.x=x; en.y=y; en.hp=hp; en.hpMax=hpMax; en.alive=true; en.state='idle'; en.respawnAt=null; }
+    if(en){
+      en.x=x; en.y=y; en.hp=hp; en.hpMax=hpMax; en.alive=true; en.state='idle'; en.respawnAt=null;
+      if(en.kind==='boss' && en.isMapBoss && zoneState[zone]){
+        zoneState[zone].bossDefeated = false;
+        zoneState[zone].bossRespawnAt = null;
+      }
+    }
   });
   mpSocket.on('partyBuff', (data)=>{
     if(!player || player.hp<=0) return;
