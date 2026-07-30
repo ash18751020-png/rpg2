@@ -7417,6 +7417,8 @@ function update(dt){
     if(en.kind==='portal') return; // 포탈은 전투 AI 대상 아님
     if(en.kind==='resource'){
       if(!en.alive && en.respawnAt!=null && nowT>=en.respawnAt){
+        en.x = 60+Math.random()*(currentZone.size.w-120);
+        en.y = 60+Math.random()*(currentZone.size.h-120);
         en.alive = true;
         en.hitsLeft = en.maxHits;
         en.respawnAt = null;
