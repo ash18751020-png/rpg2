@@ -1955,9 +1955,10 @@ const MURYEONGDOWON_ACCESSORY_ITEMS = [
 ];
 const POTION_CRAFT_TIME = 30;
 function rollAlchemyStock(){
-  const stock = POTION_TYPES.map(p=>({id:p.id, count:0}));
+  const craftablePotions = POTION_TYPES.filter(p=>p.recipe);
+  const stock = craftablePotions.map(p=>({id:p.id, count:0}));
   for(let i=0;i<5;i++){
-    const idx = Math.floor(Math.random()*POTION_TYPES.length);
+    const idx = Math.floor(Math.random()*craftablePotions.length);
     stock[idx].count++;
   }
   player.alchemyStock = stock;
@@ -4549,7 +4550,8 @@ function renderAlchemistPanel(){
   const restockRemain = Math.max(0, Math.round((player.alchemyRestockAt||0) - now));
   const rm = Math.floor(restockRemain/60), rs = restockRemain%60;
   document.getElementById('alchemistRestockTimer').textContent = `다음 재고 보충까지: ${rm}분 ${rs}초`;
-  document.getElementById('alchemistStockList').innerHTML = POTION_TYPES.map(p=>{
+  const alchemistPotions = POTION_TYPES.filter(p=>p.recipe);
+  document.getElementById('alchemistStockList').innerHTML = alchemistPotions.map(p=>{
     const stockItem = (player.alchemyStock||[]).find(s=>s.id===p.id);
     const count = stockItem ? stockItem.count : 0;
     const canAfford = (player.gold||0)>=p.price;
@@ -4560,7 +4562,7 @@ function renderAlchemistPanel(){
     </div>`;
   }).join('');
   const q = player.potionCraftQueue;
-  document.getElementById('alchemistCraftList').innerHTML = POTION_TYPES.map(p=>{
+  document.getElementById('alchemistCraftList').innerHTML = alchemistPotions.map(p=>{
     const recipeText = p.recipe.map(r=>`${r.name} x${r.count}`).join(', ');
     const mats = player.inventory||[];
     const canCraftMats = p.recipe.every(req=>{
@@ -8549,6 +8551,9 @@ function trySkill(slot){
   player.invulnUntil = performance.now()/1000 + 0.35;
   const vfxForRing = (skill.vfx || cls.vfx || {}).color || '#ffd35c';
   spawnCastRing(player.x, player.y, vfxForRing);
+  if(typeof mpConnected!=='undefined' && mpConnected && mpSocket){
+    try{ mpSocket.emit('skillCast', {zone: currentZone.id, x: player.x, y: player.y, color: vfxForRing}); }catch(e){}
+  }
   const now = performance.now()/1000;
 
   if(skill.kind==='dmg'){
@@ -9522,6 +9527,7 @@ function serializeEntitiesForNet(){
     variant: en.variant||null, scale: en.scale!=null?en.scale:null,
     isFoxOrb: en.isFoxOrb||false,
     isIllusionClone: en.isIllusionClone||false,
+    respawnAt: en.respawnAt!=null ? en.respawnAt : null,
   }));
 }
 function buildEntitiesFromNet(zone, netList){
@@ -9539,7 +9545,7 @@ function buildEntitiesFromNet(zone, netList){
         atk: Math.round((6+lvlGuess*1.6)*t.atkM*mm),
         def: Math.round((3+lvlGuess*0.9)*(t.defM||1)*mm),
         spd: t.spd, alive:net.alive, attackCd:0, home:{x:net.x,y:net.y}, state:'idle',
-        wanderT: Math.random()*3, respawnAt: null,
+        wanderT: Math.random()*3, respawnAt: net.respawnAt!=null ? net.respawnAt : null,
         pattern: t.pattern||null, specialCd: t.pattern?(t.pattern.cd*0.5):Infinity,
         isFoxOrb: net.isFoxOrb||false,
         isIllusionClone: net.isIllusionClone||false,
@@ -9563,7 +9569,7 @@ function buildEntitiesFromNet(zone, netList){
         patternReady:(b.patterns||[]).map(()=>3+Math.random()*3),
         phase2Def:b.phase2||null, phase2Triggered:false, baseAtk:b.atkBase, baseSpd:isFieldBoss?100:95,
         isFieldBoss, subareaId: net.subareaId||null, isMapBoss: !isFieldBoss,
-        respawnAt: null,
+        respawnAt: net.respawnAt!=null ? net.respawnAt : null,
       });
     } else if(net.kind==='resource'){
       entities.push({
@@ -9571,7 +9577,7 @@ function buildEntitiesFromNet(zone, netList){
         x:net.x, y:net.y, alive:net.alive,
         hitsLeft: net.hitsLeft!=null?net.hitsLeft:1, maxHits: net.maxHits!=null?net.maxHits:1,
         variant: net.variant||null, scale: net.scale!=null?net.scale:1,
-        respawnAt: null,
+        respawnAt: net.respawnAt!=null ? net.respawnAt : null,
       });
     }
   });
@@ -9697,6 +9703,10 @@ function mpConnect(){
     player.y = Math.max(20, Math.min(targetZone.size.h-20, data.toY));
     spawnFloatText(player.x, player.y-50, '🌀 공간술사의 힘에 이끌려 함께 이동했다!', '#4dffa0');
     refreshHUD();
+  });
+  mpSocket.on('skillCast', (data)=>{
+    if(!currentZone || currentZone.id!==data.zone) return;
+    spawnCastRing(data.x, data.y, data.color||'#ffd35c');
   });
   mpSocket.on('expShareReceived', ({exp})=>{
     if(!player || player.hp<=0 || !exp) return;
@@ -9952,36 +9962,71 @@ function mpBroadcastMove(dt){
   mpMoveTimer -= dt;
   if(mpMoveTimer>0) return;
   mpMoveTimer = 0.1;
+  const nowT2 = performance.now()/1000;
   mpSocket.emit('move', {
     x: player.x, y: player.y, hp: player.hp, hpMax: player.stats.hp,
     zone: currentZone ? currentZone.id : 'town', facingLeft: player.dir.x<-0.05,
+    dirX: player.dir.x, dirY: player.dir.y,
     icon: getPlayerClass().icon, name: player.name||'모험가', level: player.level,
+    classId: player.classId, isHidden: player.isHidden||false, advanced: player.advanced||false, pathId: player.pathId||null,
+    isMoving: isMoving, mounted: player.mounted||false, mountedId: player.mountedId||null,
+    attackFlash: Math.max(0, 1-((nowT2-(player.attackFlashT||0))/0.15)),
+    mechActive: !!(player.mechScaleUntil && nowT2<player.mechScaleUntil),
   });
+}
+function drawOtherPlayerAsFigure(p){
+  const backup = {
+    x: player.x, y: player.y, dir: player.dir, attackFlashT: player.attackFlashT,
+    mounted: player.mounted, mountedId: player.mountedId, mechScaleUntil: player.mechScaleUntil,
+    classId: player.classId, advanced: player.advanced, pathId: player.pathId, isHidden: player.isHidden,
+  };
+  const backupIsMoving = isMoving;
+  const nowT2 = performance.now()/1000;
+  player.x = p.x; player.y = p.y;
+  player.dir = {x: p.dirX!=null?p.dirX:(p.facingLeft?-1:1), y: p.dirY||0};
+  player.attackFlashT = p.attackFlash ? (nowT2 - (1-p.attackFlash)*0.15) : 0;
+  player.mounted = p.mounted||false;
+  player.mountedId = p.mountedId||null;
+  player.mechScaleUntil = p.mechActive ? nowT2+1 : 0;
+  player.classId = p.classId||player.classId;
+  player.advanced = p.advanced||false;
+  player.pathId = p.pathId||null;
+  player.isHidden = p.isHidden||false;
+  isMoving = p.isMoving||false;
+  try{
+    drawPlayer(true);
+  }catch(e){ console.error('다른 플레이어 렌더링 오류:', e); }
+  Object.assign(player, backup);
+  isMoving = backupIsMoving;
 }
 function drawOtherPlayers(){
   if(!mpConnected || !currentZone) return;
-  const nowT = performance.now()/1000;
   Object.values(otherPlayers).forEach(p=>{
     if(p.zone !== currentZone.id) return;
     const sx = p.x-camera.x, sy = p.y-camera.y;
-    if(sx<-60||sx>canvas.width+60||sy<-60||sy>canvas.height+60) return;
-    const bob = Math.sin(nowT*3 + p.x*0.05)*2;
-    ctx.save();
-    ctx.globalAlpha=.3; ctx.fillStyle='#000';
-    ctx.beginPath(); ctx.ellipse(sx, sy+16, 14, 6, 0,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.font='28px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.scale(p.facingLeft?-1:1,1);
-    ctx.fillText(p.icon||'🙂', p.facingLeft?-sx:sx, sy+bob);
-    ctx.restore();
+    if(sx<-80||sx>canvas.width+80||sy<-80||sy>canvas.height+80) return;
+    if(p.classId){
+      drawOtherPlayerAsFigure(p);
+    } else {
+      const nowT = performance.now()/1000;
+      const bob = Math.sin(nowT*3 + p.x*0.05)*2;
+      ctx.save();
+      ctx.globalAlpha=.3; ctx.fillStyle='#000';
+      ctx.beginPath(); ctx.ellipse(sx, sy+16, 14, 6, 0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.font='28px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.scale(p.facingLeft?-1:1,1);
+      ctx.fillText(p.icon||'🙂', p.facingLeft?-sx:sx, sy+bob);
+      ctx.restore();
+    }
     ctx.save();
     ctx.font='11px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#8fd6ff';
-    ctx.fillText(`${p.name||''} Lv.${p.level||1}`, sx, sy-24);
+    ctx.fillText(`${p.name||''} Lv.${p.level||1}`, sx, sy-30);
     // 체력바
     const w=30;
-    ctx.fillStyle='#000'; ctx.fillRect(sx-w/2-1, sy-20, w+2, 4);
-    ctx.fillStyle='#7cc576'; ctx.fillRect(sx-w/2, sy-20, w*Math.max(0,(p.hp||0)/(p.hpMax||1)), 3);
+    ctx.fillStyle='#000'; ctx.fillRect(sx-w/2-1, sy-26, w+2, 4);
+    ctx.fillStyle='#7cc576'; ctx.fillRect(sx-w/2, sy-26, w*Math.max(0,(p.hp||0)/(p.hpMax||1)), 3);
     ctx.restore();
   });
 }
@@ -12034,7 +12079,7 @@ function drawMechFrame(walkPhase){
   ctx.beginPath(); ctx.ellipse(0,23,4,3,0,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
-function drawPlayer(){
+function drawPlayer(isOtherPlayerRender){
   const sx = player.x-camera.x, sy = player.y-camera.y;
   const cls = getPlayerClass();
   const nowT = performance.now()/1000;
@@ -12096,13 +12141,15 @@ function drawPlayer(){
   drawClassFigure(cls, walkPhase, flash);
   ctx.restore();
 
-  if(buffs.atk>0){
-    ctx.font='16px sans-serif';
-    ctx.fillText('🔥', sx+22, sy-22);
-  }
-  if(buffs.def>0){
-    ctx.font='16px sans-serif';
-    ctx.fillText('🛡️', sx-22, sy-22);
+  if(!isOtherPlayerRender){
+    if(buffs.atk>0){
+      ctx.font='16px sans-serif';
+      ctx.fillText('🔥', sx+22, sy-22);
+    }
+    if(buffs.def>0){
+      ctx.font='16px sans-serif';
+      ctx.fillText('🛡️', sx-22, sy-22);
+    }
   }
 }
 </script>
