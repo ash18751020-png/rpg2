@@ -373,13 +373,17 @@
             <div id="shopShovelList" style="display:flex; flex-direction:column; gap:6px; font-size:12px; margin-bottom:14px;"></div>
             <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">🗺️ 보물지도</div>
             <div id="shopTreasureMapSection" style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px;"></div>
+            <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin:14px 0 6px;">🧭 차원의 나침반</div>
+            <div id="shopCompassSection" style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px; margin-bottom:14px;"></div>
+            <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">🥚 펫 알</div>
+            <div id="shopEggList" style="display:flex; flex-direction:column; gap:6px; font-size:12px;"></div>
           </div>
         </div>
         <button class="btn small" id="shopCloseBtn">닫기</button>
       </div>
 
       <div id="casinoOverlay" class="hidden" style="position:absolute; inset:0; background:rgba(5,5,10,.9); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; pointer-events:all; z-index:52;">
-        <div style="width:440px; max-width:92vw; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;">
+        <div style="width:440px; max-width:92vw; max-height:82vh; overflow-y:auto; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
             <div style="color:var(--gold); font-size:16px; font-weight:700;">🎰 도박장</div>
             <div style="color:#ffd35c; font-weight:700;">💰 <span id="casinoGoldDisplay">0</span> G</div>
@@ -784,6 +788,33 @@
         <button class="btn small" id="classChangeCancelBtn">취소</button>
       </div>
 
+      <div id="petInteractPanel" class="hidden" style="position:absolute; top:80px; right:14px; background:rgba(20,16,5,.92); border:1px solid #ffd35c; border-radius:10px; padding:12px; pointer-events:all; z-index:60; display:flex; flex-direction:column; gap:8px; width:230px;">
+        <div id="petInteractTitle" style="color:#ffd35c; font-size:13px; font-weight:700;"></div>
+        <div id="petInteractDesc" style="font-size:11px; color:var(--ink-dim);"></div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn small" style="flex:1;" onclick="selectPetAsCompanion()">🐾 동료로 데려가기</button>
+          <button class="btn small" style="flex:1;" onclick="nameActivePetInPanel()">✏️ 이름 지어주기</button>
+        </div>
+        <div id="petFeedOptions" style="display:flex; flex-direction:column; gap:6px;"></div>
+        <button class="btn small" id="petInteractCloseBtn" style="width:100%;">닫기</button>
+      </div>
+
+      <div id="petRoomOverlay" class="hidden" style="position:absolute; inset:0; background:rgba(5,5,10,.9); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; pointer-events:all; z-index:53;">
+        <div style="width:560px; max-width:92vw; max-height:82vh; overflow-y:auto; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;">
+          <div style="color:var(--gold); font-size:16px; font-weight:700; margin-bottom:12px;">🐶 펫룸건물</div>
+          <button class="btn small" style="width:100%; margin-bottom:14px;" onclick="enterPetRoomZone()">🚪 펫룸 들어가기</button>
+          <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">🍖 펫 먹이</div>
+          <div id="petFoodShopList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:16px;"></div>
+          <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:8px;">🔥 인큐베이터</div>
+          <div id="incubatorList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+          <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">🥚 보유 알 (인큐베이터에 넣기)</div>
+          <div id="petRoomEggList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:16px;"></div>
+          <div style="color:var(--ink-dim); font-size:12px; margin-bottom:8px;">데리고 다닐 펫을 하나 골라주세요. 등급이 높을수록 강력한 효과를 줘요.</div>
+          <div id="petRoomList" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <button class="btn small" id="petRoomCloseBtn">닫기</button>
+      </div>
+
       <div id="inventoryOverlay" class="hidden" style="position:absolute; inset:0; background:rgba(5,5,10,.9); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; pointer-events:all; z-index:52;">
         <div style="width:480px; max-width:92vw; max-height:78vh; overflow-y:auto; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;">
           <div style="color:var(--gold); font-size:16px; font-weight:700; margin-bottom:12px;">🎒 인벤토리</div>
@@ -794,6 +825,9 @@
           <div id="teruTeruBozuBox" style="display:none; margin-bottom:14px;"></div>
           <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">보유 장비</div>
           <div id="equipInventoryList" style="display:flex; flex-direction:column; gap:6px; font-size:12px; margin-bottom:14px;"></div>
+          <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">🥚 보유 알</div>
+          <div id="eggInventoryList" style="display:flex; flex-direction:column; gap:6px; font-size:12px; margin-bottom:14px;"></div>
+          <button class="btn small" style="width:100%; margin-bottom:14px;" onclick="openPetRoom()">🏠 펫룸 열기</button>
           <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">보유 음식 (V키로 지정한 음식 취식, 전투 중 사용 가능)</div>
           <div id="foodInventoryList" style="display:flex; flex-direction:column; gap:6px; font-size:12px; margin-bottom:14px;"></div>
           <div style="color:var(--ink-dim); font-weight:700; font-size:12px; margin-bottom:6px;">보유 물약 (B키로 지정한 물약 즉시 사용, 전투 중 사용 가능)</div>
@@ -891,6 +925,16 @@
         <div id="gamerXpText" style="font-size:11px; color:var(--ink-dim); text-align:center;"></div>
         <div style="font-size:11px; color:var(--ink-dim);">사냥·낚시·도박·농사·채굴·PVP를 즐길수록 쌓여요. 가득 차면 2차 전직 방향을 고를 수 있어요.</div>
         <button id="gamerAdvanceBtn" class="btn small hidden" style="width:100%;" onclick="advanceToFighterGamer()">🥊 격투게임 플레이어로 전직</button>
+        <button id="gamerAdvanceChessBtn" class="btn small hidden" style="width:100%;" onclick="advanceToChessPlayer()">♟️ 체스 플레이어로 전직</button>
+      </div>
+
+      <div id="chessXpPanel" class="hidden" style="position:absolute; top:80px; left:14px; background:rgba(20,20,20,.92); border:1px solid #d8d8d8; border-radius:10px; padding:12px; pointer-events:all; z-index:60; display:flex; flex-direction:column; gap:8px; width:250px;">
+        <div id="chessRankTitle" style="color:#d8d8d8; font-size:13px; font-weight:700;">♟️ 체스 플레이어 - 폰</div>
+        <div style="background:rgba(255,255,255,.1); border-radius:6px; height:16px; overflow:hidden;">
+          <div id="chessXpBarFill" style="background:linear-gradient(90deg,#8fd6ff,#ffd35c); height:100%; width:0%;"></div>
+        </div>
+        <div id="chessXpText" style="font-size:11px; color:var(--ink-dim); text-align:center;"></div>
+        <div style="font-size:11px; color:var(--ink-dim);">사냥을 계속하면 기물 등급이 폰→나이트→비숍→룩→퀸 순으로 올라가요.</div>
       </div>
 
       <div id="dimensionWalkerPanel" class="hidden" style="position:absolute; top:80px; left:14px; background:rgba(20,10,30,.92); border:1px solid #8a5cff; border-radius:10px; padding:12px; pointer-events:all; z-index:60; display:flex; flex-direction:column; gap:8px; width:250px;">
@@ -1984,6 +2028,75 @@ function equipDropRateBonus(){
   });
   return total;
 }
+function applyPetPeriodicBuff(buff){
+  const now = performance.now()/1000;
+  if(buff.type==='heal'){
+    const heal = Math.round(player.stats.hp*buff.pct);
+    player.hp = Math.min(player.stats.hp, player.hp+heal);
+    spawnFloatText(player.x, player.y-60, `🐾 +${heal} (펫)`, '#7cc576');
+  } else if(buff.type==='buff_atk'){
+    buffs.atk = Math.max(buffs.atk||0, buff.amount); buffs.atkUntil = now+buff.dur;
+    spawnFloatText(player.x, player.y-60, '🐾 공격력 증가! (펫)', '#ffcf6a');
+  } else if(buff.type==='buff_spd'){
+    player.spdBuff = Math.max(player.spdBuff||0, buff.amount); player.spdBuffUntil = now+buff.dur;
+    spawnFloatText(player.x, player.y-60, '🐾 이동속도 증가! (펫)', '#8fd6ff');
+  } else if(buff.type==='buff_atk_spd'){
+    buffs.atk = Math.max(buffs.atk||0, buff.atkAmount); buffs.atkUntil = now+buff.dur;
+    player.spdBuff = Math.max(player.spdBuff||0, buff.spdAmount); player.spdBuffUntil = now+buff.dur;
+    spawnFloatText(player.x, player.y-60, '🐲 용의 축복! 공격력·이동속도 대폭 증가! (펫)', '#ff9d4a');
+  }
+}
+function tickActivePet(dt){
+  if(!document.getElementById('chessXpPanel').classList.contains('hidden')){
+    const now2 = performance.now()/1000;
+    if(!player._lastChessXpRenderAt || now2 - player._lastChessXpRenderAt >= 0.5){
+      player._lastChessXpRenderAt = now2;
+      renderChessXpPanel();
+    }
+  }
+  if(!document.getElementById('petRoomOverlay').classList.contains('hidden')){
+    const now = performance.now()/1000;
+    if(!player._lastIncubatorRenderAt || now - player._lastIncubatorRenderAt >= 1){
+      player._lastIncubatorRenderAt = now;
+      renderIncubators();
+    }
+  }
+  const inst = player.activePetInstanceId && player.petCollection ? player.petCollection.find(p=>p.instanceId===player.activePetInstanceId) : null;
+  const pet = inst ? PET_TYPES.find(p=>p.id===inst.petId) : null;
+  const now = performance.now()/1000;
+  if(pet && pet.periodicBuff){
+    if(!player.petBuffNextAt || now >= player.petBuffNextAt){
+      player.petBuffNextAt = now + pet.periodicBuff.interval;
+      applyPetPeriodicBuff(pet.periodicBuff);
+    }
+  }
+  if(pet && currentZone.id!=='pet_room'){
+    const existingHelper = spirits.find(s=>s.spiritId==='active_pet_helper');
+    const petDisplayName = (player.petNames||{})[inst.instanceId] || pet.name;
+    if(!existingHelper){
+      spirits.push({
+        spiritId:'active_pet_helper', icon:pet.icon, color: PET_RARITY_COLORS[pet.rarity],
+        x: player.x, y: player.y-20,
+        expiresAt: now + 999999, tickInterval: 1.5, tickTimer:0,
+        mult: pet.rarity==='mythic' ? 2.0 : 1.5, range: pet.combatHelper?170:0, followDist: 55,
+        spd: 240, hasHp: false, passive: !pet.combatHelper, petName: petDisplayName,
+      });
+    } else {
+      existingHelper.passive = !pet.combatHelper;
+      existingHelper.icon = pet.icon;
+      existingHelper.petName = petDisplayName;
+    }
+  } else {
+    spirits = spirits.filter(s=>s.spiritId!=='active_pet_helper');
+  }
+}
+function getActivePetStatBonus(stat){
+  if(!player.activePetInstanceId || !player.petCollection) return 0;
+  const inst = player.petCollection.find(p=>p.instanceId===player.activePetInstanceId);
+  if(!inst) return 0;
+  const pet = PET_TYPES.find(p=>p.id===inst.petId);
+  return (pet && pet.statBuff && pet.statBuff[stat]) || 0;
+}
 function recalcEquippedStats(){
   if(!player.baseStats) player.baseStats = {...player.stats};
   const b = player.baseStats;
@@ -1991,11 +2104,11 @@ function recalcEquippedStats(){
   const mpRatio = player.stats.mp ? player.mp/player.stats.mp : 1;
   const hwaryongpaMult = (player.awakened && player.pathId==='hwaryongpa') ? 1.4 : 1;
   player.stats = {
-    hp: Math.round(b.hp * (1+equipStatBonus('hp')) * hwaryongpaMult),
-    mp: Math.round(b.mp * (1+equipStatBonus('mp'))),
-    atk: Math.round(b.atk * (1+equipStatBonus('atk'))),
-    def: Math.round(b.def * (1+equipStatBonus('def')) * hwaryongpaMult),
-    spd: Math.round(b.spd * (1+equipStatBonus('spd'))),
+    hp: Math.round(b.hp * (1+equipStatBonus('hp')+getActivePetStatBonus('hp')) * hwaryongpaMult),
+    mp: Math.round(b.mp * (1+equipStatBonus('mp')+getActivePetStatBonus('mp'))),
+    atk: Math.round(b.atk * (1+equipStatBonus('atk')+getActivePetStatBonus('atk'))),
+    def: Math.round(b.def * (1+equipStatBonus('def')+getActivePetStatBonus('def')) * hwaryongpaMult),
+    spd: Math.round(b.spd * (1+equipStatBonus('spd')+getActivePetStatBonus('spd'))),
   };
   player.hp = Math.round(player.stats.hp*hpRatio);
   player.mp = Math.round(player.stats.mp*mpRatio);
@@ -2274,6 +2387,7 @@ function findZoneById(id){
   if(id==='sky_town') return SKY_TOWN_ZONE;
   if(id==='colosseum') return COLOSSEUM_ZONE;
   if(id==='fractured_dimension') return FRACTURED_DIMENSION_ZONE;
+  if(id==='pet_room') return PET_ROOM_ZONE;
   if(id==='muryeongdowon_arena') return MURYEONGDOWON_ARENA_ZONE;
   if(id==='hwaryongpa_arena') return HWARYONGPA_ARENA_ZONE;
   const z1 = ZONES.find(z=>z.id===id); if(z1) return z1;
@@ -2447,6 +2561,65 @@ function advanceToFighterGamer(){
   recalcEquippedStats();
   refreshHUD();
 }
+const CHESS_XP_MAX = 1000;
+const CHESS_RANKS = [
+  {id:'pawn', name:'폰', icon:'♟️', xpReq:0, meleePattern:'diagonal',
+   base:{hp:100,mp:50,atk:16,def:8,spd:180},
+   figure:{bodyColor:'#d8d8d8', bodyShape:'light', head:'none', weapon:'sword', weaponColor:'#ffffff'},
+   skillQ:{name:'전진 찌르기', desc:'대각선 방향을 노려 찌른다 (물리 160%, 대각선 적중 시 크리티컬)', cost:10, cd:2, kind:'dmg', mult:1.6, range:70, icon:'♟️'}},
+  {id:'knight', name:'나이트', icon:'♞', xpReq:200, meleePattern:null,
+   base:{hp:120,mp:60,atk:22,def:10,spd:230},
+   figure:{bodyColor:'#8a6a4a', bodyShape:'light', head:'headband', weapon:'sword', weaponColor:'#c9a878'},
+   skillQ:{name:'나이트의 도약', desc:'앞으로 두 칸, 옆으로 한 칸 자리로 순간이동하여 공격한다 (물리 220%)', cost:16, cd:4, kind:'knight_leap_dmg', mult:2.2, icon:'♞'}},
+  {id:'bishop', name:'비숍', icon:'♝', xpReq:400, meleePattern:null,
+   base:{hp:110,mp:100,atk:24,def:9,spd:190},
+   figure:{bodyColor:'#5a2a6a', bodyShape:'robe', head:'headband', weapon:'staff', weaponColor:'#c9a0ff'},
+   skillQ:{name:'사선 마법탄', desc:'대각선으로 마법탄을 발사한다 (마법 210%, 원거리)', cost:16, cd:2.2, kind:'dmg', mult:2.1, range:230, icon:'♝'}},
+  {id:'rook', name:'룩', icon:'♜', xpReq:600, meleePattern:'orthogonal',
+   base:{hp:160,mp:60,atk:26,def:20,spd:160},
+   figure:{bodyColor:'#5a5a5a', bodyShape:'armor', head:'helmet', weapon:'hammer', weaponColor:'#8a8a8a'},
+   skillQ:{name:'직선 돌격', desc:'앞뒤좌우 직선으로 강하게 돌진한다 (물리 240%, 직선 적중 시 크리티컬)', cost:18, cd:4.5, kind:'charge', dashSpeedMult:4.5, dashDur:0.4, mult:2.4, icon:'♜'}},
+  {id:'queen', name:'퀸', icon:'♛', xpReq:800, meleePattern:'all',
+   base:{hp:150,mp:100,atk:32,def:14,spd:240},
+   figure:{bodyColor:'#c9a020', bodyShape:'robe', head:'halo', weapon:'sword', weaponColor:'#ffe17a'},
+   skillQ:{name:'여왕의 축복', desc:'전방을 벤 후 6초간 자신의 공격력과 이동속도가 크게 증가한다 (물리 260%, 전방향 적중 시 크리티컬)', cost:24, cd:9, kind:'dmg_self_buff', mult:2.6, range:80, buffAtk:0.3, buffSpd:0.3, buffDur:6, icon:'♛'}},
+];
+function getChessRank(){
+  const xp = player.chessXp||0;
+  let idx = 0;
+  for(let i=0;i<CHESS_RANKS.length;i++){ if(xp>=CHESS_RANKS[i].xpReq) idx=i; }
+  return idx;
+}
+function advanceToChessPlayer(){
+  if(!player || player.classId!=='gamer' || (player.gamerXp||0) < GAMER_XP_MAX) return;
+  player.classId = 'chess_gamer';
+  player.gamerSecondTier = true;
+  player.chessXp = 0;
+  document.getElementById('gamerXpPanel').classList.add('hidden');
+  spawnFloatText(player.x, player.y-100, '♟️ 체스 플레이어로 전직! (폰부터 시작)', '#d8d8d8');
+  const cls = getPlayerClass();
+  player.baseStats = scaleStatsToLevel(cls.base, player.level, true);
+  recalcEquippedStats();
+  refreshHUD();
+}
+function renderChessXpPanel(){
+  if(!player || player.classId!=='chess_gamer') return;
+  const rankIdx = getChessRank();
+  const rank = CHESS_RANKS[rankIdx];
+  const xp = player.chessXp||0;
+  const nextRank = CHESS_RANKS[rankIdx+1];
+  document.getElementById('chessRankTitle').textContent = `${rank.icon} 체스 플레이어 - ${rank.name}`;
+  const span = nextRank ? nextRank.xpReq - rank.xpReq : 1;
+  const progressInStage = nextRank ? xp - rank.xpReq : span;
+  document.getElementById('chessXpBarFill').style.width = Math.min(100, progressInStage/span*100)+'%';
+  document.getElementById('chessXpText').textContent = nextRank ? `${xp} / ${nextRank.xpReq} (다음: ${nextRank.name})` : `${xp} / ${CHESS_XP_MAX} (최고 등급 퀸)`;
+}
+function toggleChessXpPanel(){
+  if(!player || player.classId!=='chess_gamer') return;
+  const panel = document.getElementById('chessXpPanel');
+  panel.classList.toggle('hidden');
+  if(!panel.classList.contains('hidden')) renderChessXpPanel();
+}
 function toggleGamerXpPanel(){
   if(!player || player.classId!=='gamer' || player.gamerSecondTier) return;
   const panel = document.getElementById('gamerXpPanel');
@@ -2456,6 +2629,7 @@ function toggleGamerXpPanel(){
     document.getElementById('gamerXpBarFill').style.width = Math.min(100, xp/GAMER_XP_MAX*100)+'%';
     document.getElementById('gamerXpText').textContent = `${xp} / ${GAMER_XP_MAX}${xp>=GAMER_XP_MAX?' (MAX! 2차 전직 가능)':''}`;
     document.getElementById('gamerAdvanceBtn').classList.toggle('hidden', xp<GAMER_XP_MAX);
+    document.getElementById('gamerAdvanceChessBtn').classList.toggle('hidden', xp<GAMER_XP_MAX);
   }
 }
 function toggleDimensionWalkerPanel(){
@@ -2718,6 +2892,15 @@ function renderMapCanvas(){
     const tx = offX+player.treasurePos.x*scale, ty = offY+player.treasurePos.y*scale;
     mctx.strokeStyle = '#ff3b3b'; mctx.lineWidth = 3;
     mctx.beginPath(); mctx.moveTo(tx-7,ty-7); mctx.lineTo(tx+7,ty+7); mctx.moveTo(tx+7,ty-7); mctx.lineTo(tx-7,ty+7); mctx.stroke();
+  }
+  if(player.dimensionCompassOwned && player.dimensionRiftActive && zone.id===currentZone.id){
+    const riftEn3 = entities.find(e=>e.isDimensionRift);
+    if(riftEn3){
+      const rx = offX+riftEn3.x*scale, ry = offY+riftEn3.y*scale;
+      mctx.strokeStyle = '#4a90ff'; mctx.lineWidth = 3;
+      mctx.beginPath(); mctx.arc(rx, ry, 9, 0, Math.PI*2); mctx.stroke();
+      mctx.beginPath(); mctx.moveTo(rx-9,ry); mctx.lineTo(rx+9,ry); mctx.moveTo(rx,ry-9); mctx.lineTo(rx,ry+9); mctx.stroke();
+    }
   }
   const px = offX + player.x*scale, py = offY + player.y*scale;
   mctx.fillStyle = '#ffd35c';
@@ -3058,6 +3241,15 @@ const FARM_INITIAL_PLOTS = 4;
 const FARM_WORKER_HIRE_COST = 3000;
 const FARM_PLOTS_PER_EXPAND = 2;
 const FARM_EXPAND_BASE_COST = 150;
+const PET_ROOM_ZONE = {
+  id:'pet_room', name:'펫룸', lvl:'평화 지역', bg:['#fff4d9','#ffe8b8'], ground:'#ffe8c8',
+  monsters:[], count:0, size:{w:1200,h:900},
+};
+const PET_FOOD_TYPES = [
+  {id:'basic_treat', name:'기본 간식', icon:'🦴', price:100, buffAmount:0.1, buffDur:180},
+  {id:'tasty_treat', name:'맛있는 간식', icon:'🍖', price:400, buffAmount:0.2, buffDur:300},
+  {id:'premium_treat', name:'최고급 간식', icon:'🍗', price:1200, buffAmount:0.35, buffDur:480},
+];
 const FARM_ZONE = {
   id:'farm', name:'내 농장', lvl:'Lv 0 (평화 지역)', bg:['#3a5a28','#4a7a34'], ground:'#5a8a3a',
   monsters:[], count:0, size:{w:1000,h:900},
@@ -3586,6 +3778,7 @@ const CASINO_POS = {x:1080, y:610};
 const BLACKSMITH_POS = {x:620, y:610};
 const RESTAURANT_POS = {x:480, y:700};
 const MOUNT_SHOP_POS = {x:920, y:480};
+const PET_ROOM_POS = {x:280, y:610};
 const ALCHEMIST_POS = {x:760, y:700};
 const FARMER_POS = {x:1040, y:700};
 const DIMENSIONAL_PORTAL_POS = {x:650, y:480};
@@ -3620,7 +3813,7 @@ const TOWN_DECOR = [
   {type:'farmer', x:1040, y:700},
   {type:'fishing', x:180, y:700},
   {type:'mountshop', x:920, y:480},
-  {type:'mountshop', x:280, y:610},
+  {type:'petroom', x:280, y:610},
 
   {type:'tree', x:480, y:150}, {type:'tree', x:560, y:130},
   {type:'tree', x:940, y:150}, {type:'tree', x:1020, y:130},
@@ -3796,6 +3989,8 @@ let foxdenRaining = false; // 여우산에 비가 내리는 중인지 (입장할
 let nearBeggarNPC = false; // 2세계 마을에서 거지 NPC에 근접했는지 여부
 let nearTownFishingPortal = false; // 마을에서 낚시터 입구에 근접했는지 여부
 let nearMountShop = false; // 마을에서 이동수단 상점에 근접했는지 여부
+let nearPetRoomBuilding = false;
+let nearPetNpc = null;
 let nearTownNpc = null; // 마을에서 근접한 일반 NPC (대화/퀘스트용)
 let nearSpaceRiftObject = false; // 공간의 균열 안에서 균열 오브젝트에 근접했는지 여부
 let nearAsuraForTalisman = null; // 전쟁의 땅에서 부적 사용 가능한 아수라왕 엔티티
@@ -4073,6 +4268,21 @@ startBtn.onclick = ()=>{
    UI: WORLD MAP
    ========================================================================= */
 function getPlayerClass(){
+  if(player.classId==='chess_gamer'){
+    const rank = CHESS_RANKS[getChessRank()];
+    const queenBonus = rank.id==='queen' ? 1.15 : 1;
+    const boostedBase = queenBonus===1 ? rank.base : {
+      hp: Math.round(rank.base.hp*queenBonus), mp: Math.round(rank.base.mp*queenBonus),
+      atk: Math.round(rank.base.atk*queenBonus), def: Math.round(rank.base.def*queenBonus), spd: Math.round(rank.base.spd*queenBonus),
+    };
+    return {
+      id:'chess_gamer', name:`체스 플레이어 (${rank.name})`, role:'히든 2차 · 체스 기물', icon:rank.icon,
+      base:boostedBase, atkRange:rank.meleePattern?75:rank.skillQ.range||75,
+      vfx:{kind: rank.id==='bishop' ? 'orb' : 'melee', color:'#d8d8d8', icon:rank.icon},
+      figure:rank.figure, skillQ:rank.skillQ,
+      skillE:{name:'킹의 소환', desc:'잠시 킹이 되어 기물을 소환한다 (10초)', cost:30, cd:20, kind:'king_summon', dur:10, icon:'♚'},
+    };
+  }
   if(player.isHidden) return HIDDEN_CLASS_BY_ID[player.classId];
   const base = CLASS_BY_ID[player.classId];
   if(player.advanced && player.pathId){
@@ -4300,6 +4510,7 @@ zoneState[SKY_ZONE.id] = {bossDefeated:true, bossRespawnAt:null};
 zoneState[SKY_TOWN_ZONE.id] = {bossDefeated:true, bossRespawnAt:null};
 zoneState[COLOSSEUM_ZONE.id] = {bossDefeated:true, bossRespawnAt:null};
 zoneState[FRACTURED_DIMENSION_ZONE.id] = {bossDefeated:false, bossRespawnAt:null};
+zoneState[PET_ROOM_ZONE.id] = {bossDefeated:true, bossRespawnAt:null};
 function getActiveZones(){ return player.currentWorld===2 ? ZONES2 : ZONES; }
 function getActiveReqLevel(i){ return player.currentWorld===2 ? requiredLevelForZone2(i) : requiredLevelForZone(i); }
 
@@ -4626,6 +4837,20 @@ function renderShopBuyList(){
     const canAffordMap = (player.gold||0) >= 30000;
     tmSection.innerHTML = `<div>🗺️ 보물지도</div><button class="btn small" ${canAffordMap?'':'disabled style="opacity:.4;"'} onclick="buyTreasureMap()">30000G 구매</button>`;
   }
+  const compassSection = document.getElementById('shopCompassSection');
+  if(player.dimensionCompassOwned){
+    compassSection.innerHTML = `<div>🧭 차원의 나침반 보유 중</div><span style="color:var(--ink-dim);">차원의 균열 위치를 알려줘요</span>`;
+  } else {
+    const canAffordCompass = (player.gold||0) >= 5000;
+    compassSection.innerHTML = `<div>🧭 차원의 나침반</div><button class="btn small" ${canAffordCompass?'':'disabled style="opacity:.4;"'} onclick="buyDimensionCompass()">5000G 구매</button>`;
+  }
+  document.getElementById('shopEggList').innerHTML = EGG_TYPES.map(egg=>{
+    const canAfford = (player.gold||0) >= egg.price;
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px;">
+      <div>${egg.icon} ${egg.name}</div>
+      <button class="btn small" ${canAfford?'':'disabled style="opacity:.4;"'} onclick="buyEgg('${egg.id}')">${egg.price}G 구매</button>
+    </div>`;
+  }).join('');
 }
 function closeShop(){
   document.getElementById('shopOverlay').classList.add('hidden');
@@ -5625,6 +5850,14 @@ function useDimensionalTome(){
   }
 }
 function renderInventoryPanel(){
+  const eggInv = player.eggInventory||[];
+  document.getElementById('eggInventoryList').innerHTML = eggInv.length ? eggInv.map(e=>{
+    const egg = EGG_TYPES.find(x=>x.id===e.id);
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px;">
+      <div>${egg.icon} ${egg.name} x${e.count}</div>
+      <span style="color:var(--ink-dim); font-size:11px;">펫룸 인큐베이터에서 부화</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--ink-dim); text-align:center; padding:6px 0;">보유한 알이 없습니다.</div>';
   const tomeBox = document.getElementById('dimensionalTomeBox');
   if(player.dimensionalTome){
     tomeBox.style.display='block';
@@ -6117,6 +6350,12 @@ function updatePortalPrompt(){
     el.classList.remove('hidden');
     return;
   }
+  if(nearPetNpc){
+    el.textContent = `F 키 : ${nearPetNpc.icon} ${nearPetNpc.name}와 상호작용`;
+    el.style.color = '#ffd35c';
+    el.classList.remove('hidden');
+    return;
+  }
   if(nearWorld2Shop){
     el.textContent = 'F 키 : 🎫 2세계 상점 열기';
     el.style.color = '#8a5cff';
@@ -6198,6 +6437,12 @@ function updatePortalPrompt(){
   }
   if(nearMountShop){
     el.textContent = 'F 키 : 🐴 이동수단 상점';
+    el.style.color = '#d8a878';
+    el.classList.remove('hidden');
+    return;
+  }
+  if(nearPetRoomBuilding){
+    el.textContent = 'F 키 : 🐶 펫룸';
     el.style.color = '#d8a878';
     el.classList.remove('hidden');
     return;
@@ -6390,6 +6635,7 @@ function tryEnterPortal(){
     }
     return;
   }
+  if(nearPetNpc){ interactWithPetNpc(nearPetNpc); return; }
   if(nearWorld2Shop){ openWorld2Shop(); return; }
   if(nearHackerRift){ openHackerPuzzle(); return; }
   if(nearImugiCompanion){
@@ -6409,6 +6655,7 @@ function tryEnterPortal(){
   if(nearFarmer){ enterZone(FARM_ZONE); return; }
   if(nearTownFishingPortal){ enterZone(TOWN_FISHING_ZONE); return; }
   if(nearMountShop){ openMountShop(); return; }
+  if(nearPetRoomBuilding){ openPetRoom(); return; }
   if(nearTownNpc){ interactTownNpc(nearTownNpc); return; }
   if(nearSpaceRiftObject){ openSpaceMagePuzzle(); return; }
   if(nearAsuraForTalisman){ useAsuraTalisman(nearAsuraForTalisman); return; }
@@ -6448,7 +6695,7 @@ window.addEventListener('keydown', e=>{
   if(e.key.toLowerCase()==='t'){ tryUseAwakening(); }
   if(e.key.toLowerCase()==='v'){ tryEatFood(); }
   if(e.key.toLowerCase()==='b'){ tryUsePotion(); }
-  if(e.key.toLowerCase()==='x'){ toggleHackerCheatPanel(); toggleSpaceMagePanel(); toggleTimeMagePanel(); toggleDimensionWalkerPanel(); toggleGamerXpPanel(); }
+  if(e.key.toLowerCase()==='x'){ toggleHackerCheatPanel(); toggleSpaceMagePanel(); toggleTimeMagePanel(); toggleDimensionWalkerPanel(); toggleGamerXpPanel(); toggleChessXpPanel(); }
   if(e.key.toLowerCase()==='o'){ useOxygenTank(); }
 });
 
@@ -6830,6 +7077,36 @@ const PICKAXES = [
   {tier:9, name:'레디언스 곡괭이', icon:'⛏️', price:240000, yieldMult:15.0, skyExclusive:true},
   {tier:10, name:'레인보우 곡괭이', icon:'⛏️', price:420000, yieldMult:20.0, skyExclusive:true},
 ];
+const PET_TYPES = [
+  // 일반
+  {id:'chick', name:'병아리', icon:'🐣', rarity:'common', cry:'삐약삐약!', statBuff:{hp:0.02,atk:0.01}, periodicBuff:null, combatHelper:false, reviveChance:0},
+  {id:'mole', name:'두더지', icon:'🦫', rarity:'common', cry:'쓱삭쓱삭...', statBuff:{def:0.03}, periodicBuff:null, combatHelper:false, reviveChance:0},
+  {id:'squirrel', name:'다람쥐', icon:'🐿️', rarity:'common', cry:'찌찌짓!', statBuff:{spd:0.03}, periodicBuff:null, combatHelper:false, reviveChance:0},
+  {id:'beetle', name:'딱정벌레', icon:'🪲', rarity:'common', cry:'또각또각...', statBuff:{atk:0.02,def:0.01}, periodicBuff:null, combatHelper:false, reviveChance:0},
+  // 희귀
+  {id:'foxkit', name:'아기여우', icon:'🦊', rarity:'rare', cry:'깨갱! 컹!', statBuff:{hp:0.05,atk:0.03}, periodicBuff:{type:'heal', pct:0.05, interval:20}, combatHelper:false, reviveChance:0},
+  {id:'owlet', name:'부엉이', icon:'🦉', rarity:'rare', cry:'부엉~ 부엉~', statBuff:{spd:0.05,def:0.03}, periodicBuff:{type:'buff_atk', amount:0.15, dur:8, interval:25}, combatHelper:false, reviveChance:0},
+  {id:'wolfpup', name:'늑대새끼', icon:'🐺', rarity:'rare', cry:'아우우우!', statBuff:{atk:0.06}, periodicBuff:{type:'buff_spd', amount:0.2, dur:8, interval:22}, combatHelper:false, reviveChance:0},
+  // 전설
+  {id:'babydragon', name:'아기용', icon:'🐲', rarity:'legendary', cry:'크르릉... 캬아앙!', statBuff:{hp:0.14,atk:0.1,def:0.07,spd:0.06}, periodicBuff:{type:'buff_atk_spd', atkAmount:0.25, spdAmount:0.25, dur:10, interval:14}, combatHelper:true, reviveChance:0},
+  {id:'phoenixchick', name:'불사조 새끼', icon:'🔥', rarity:'legendary', cry:'끼이이익!', statBuff:{hp:0.12,atk:0.06}, periodicBuff:{type:'heal', pct:0.1, interval:12}, combatHelper:true, reviveChance:0.25},
+  // 신화
+  {id:'babyspirit', name:'아기정령', icon:'✨', rarity:'mythic', cry:null, statBuff:{hp:0.2,atk:0.15,def:0.15,spd:0.1}, periodicBuff:{type:'heal', pct:0.15, interval:10}, combatHelper:true, reviveChance:0.5},
+];
+const PET_RARITY_NAMES = {common:'일반', rare:'희귀', legendary:'전설', mythic:'신화'};
+const PET_RARITY_COLORS = {common:'#cccccc', rare:'#4a90ff', legendary:'#c96aff', mythic:'#ffd700'};
+const EGG_TYPES = [
+  {id:'common_egg', name:'평범한 알', icon:'🥚', price:2000, odds:{common:0.75, rare:0.22, legendary:0.028, mythic:0.002}},
+  {id:'rare_egg', name:'신비한 알', icon:'🥚', price:8000, odds:{common:0.35, rare:0.5, legendary:0.13, mythic:0.02}},
+  {id:'legendary_egg', name:'찬란한 알', icon:'🥚', price:25000, odds:{common:0.05, rare:0.3, legendary:0.55, mythic:0.10}},
+];
+function rollPetFromEgg(egg){
+  const r = Math.random();
+  let acc = 0, rarity = 'common';
+  for(const rk in egg.odds){ acc += egg.odds[rk]; if(r<=acc){ rarity=rk; break; } }
+  const pool = PET_TYPES.filter(p=>p.rarity===rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 const MOUNTS = [
   {id:'horse', name:'말', icon:'🐴', price:300, spdBonus:0.40},
   {id:'bear', name:'곰', icon:'🐻', price:600, spdBonus:0.42},
@@ -6906,6 +7183,259 @@ function buyShovel(tier){
   if(!t || tier<=(player.shovelTier||1) || (player.gold||0)<t.price) return;
   player.gold -= t.price;
   player.shovelTier = tier;
+  refreshHUD();
+  renderShopBuyList();
+}
+let petInteractInstanceId = null;
+function interactWithPetNpc(petNpc){
+  const pet = PET_TYPES.find(p=>p.id===petNpc.petId);
+  if(!pet) return;
+  if(pet.cry){
+    spawnFloatText(petNpc.x, petNpc.y-50, pet.cry, PET_RARITY_COLORS[pet.rarity]);
+  } else {
+    spawnImpact('✨', petNpc.x, petNpc.y-20, PET_RARITY_COLORS[pet.rarity], true);
+  }
+  petInteractInstanceId = petNpc.instanceId;
+  renderPetInteractPanel();
+  document.getElementById('petInteractPanel').classList.remove('hidden');
+}
+function nameActivePetInPanel(){
+  if(!petInteractInstanceId) return;
+  const name = prompt('이 펫에게 지어줄 이름을 입력하세요 (최대 8자):');
+  if(!name) return;
+  const trimmed = name.trim().slice(0,8);
+  if(!trimmed) return;
+  if(!player.petNames) player.petNames={};
+  player.petNames[petInteractInstanceId] = trimmed;
+  spawnFloatText(player.x, player.y-50, `✏️ "${trimmed}"(이)라는 이름을 지어줬다!`, '#ffd35c');
+  renderPetInteractPanel();
+}
+function renderPetInteractPanel(){
+  const inst = (player.petCollection||[]).find(p=>p.instanceId===petInteractInstanceId);
+  if(!inst) return;
+  const pet = PET_TYPES.find(p=>p.id===inst.petId);
+  const isActive = player.activePetInstanceId===petInteractInstanceId;
+  const customName = (player.petNames||{})[petInteractInstanceId];
+  document.getElementById('petInteractTitle').textContent = `${pet.icon} ${customName?`${customName} (${pet.name})`:pet.name} (${PET_RARITY_NAMES[pet.rarity]})`;
+  document.getElementById('petInteractDesc').textContent = isActive ? '지금 데리고 다니는 중이에요.' : '이 펫과 상호작용할 수 있어요.';
+  const foodInv = player.petFoodInventory||[];
+  document.getElementById('petFeedOptions').innerHTML = foodInv.length ? foodInv.map(f=>{
+    const food = PET_FOOD_TYPES.find(x=>x.id===f.id);
+    return `<button class="btn small" onclick="feedPetWithFood('${f.id}')">${food.icon} ${food.name} 먹이기 (${f.count}개)</button>`;
+  }).join('') : '<div style="font-size:11px; color:var(--ink-dim);">보유한 먹이가 없어요.</div>';
+}
+function selectPetAsCompanion(){
+  if(!petInteractInstanceId) return;
+  player.activePetInstanceId = petInteractInstanceId;
+  recalcEquippedStats();
+  refreshHUD();
+  renderPetInteractPanel();
+  spawnFloatText(player.x, player.y-50, '🐾 동료로 함께하기로 했다!', '#ffd35c');
+}
+function feedPetWithFood(foodId){
+  if(!petInteractInstanceId) return;
+  const foodItem = (player.petFoodInventory||[]).find(f=>f.id===foodId);
+  if(!foodItem || foodItem.count<=0) return;
+  const food = PET_FOOD_TYPES.find(f=>f.id===foodId);
+  foodItem.count--;
+  if(foodItem.count<=0) player.petFoodInventory = player.petFoodInventory.filter(f=>f!==foodItem);
+  if(player.activePetInstanceId===petInteractInstanceId){
+    buffs.atk = Math.max(buffs.atk||0, food.buffAmount); buffs.atkUntil = performance.now()/1000 + food.buffDur;
+    spawnFloatText(player.x, player.y-60, `${food.icon} 먹이를 줬다! (공격력 증가, ${Math.round(food.buffDur/60)}분)`, '#7cc576');
+  } else {
+    spawnFloatText(player.x, player.y-60, `${food.icon} 먹이를 줬다! (동료로 데려가면 효과 적용)`, '#7cc576');
+  }
+  renderPetInteractPanel();
+}
+document.getElementById('petInteractCloseBtn').onclick = ()=>{
+  document.getElementById('petInteractPanel').classList.add('hidden');
+  petInteractInstanceId = null;
+};
+function enterPetRoomZone(){
+  document.getElementById('petRoomOverlay').classList.add('hidden');
+  enterZone(PET_ROOM_ZONE);
+}
+function openPetRoom(){
+  document.getElementById('inventoryOverlay').classList.add('hidden');
+  document.getElementById('petRoomOverlay').classList.remove('hidden');
+  renderPetRoom();
+}
+function renderPetRoom(){
+  renderPetFoodShop();
+  renderIncubators();
+  ensureIncubators();
+  const eggInv = player.eggInventory||[];
+  const emptySlotExists = player.incubators.some(s=>s.unlocked && !s.eggId);
+  document.getElementById('petRoomEggList').innerHTML = eggInv.length ? eggInv.map(e=>{
+    const egg = EGG_TYPES.find(x=>x.id===e.id);
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px;">
+      <div>${egg.icon} ${egg.name} x${e.count}</div>
+      <button class="btn small" ${emptySlotExists?'':'disabled style="opacity:.4;"'} onclick="putEggInFirstEmptySlot('${e.id}')">${emptySlotExists?'인큐베이터에 넣기':'빈 인큐베이터 없음'}</button>
+    </div>`;
+  }).join('') : '<div style="color:var(--ink-dim); text-align:center; padding:6px 0;">보유한 알이 없습니다. 상점에서 구매해보세요!</div>';
+  const collection = player.petCollection||[];
+  const el = document.getElementById('petRoomList');
+  if(!collection.length){
+    el.innerHTML = '<div style="color:var(--ink-dim); text-align:center; padding:20px 0;">아직 부화한 펫이 없습니다. 상점에서 알을 사서 부화시켜보세요!</div>';
+    return;
+  }
+  el.innerHTML = collection.map(inst=>{
+    const pet = PET_TYPES.find(p=>p.id===inst.petId);
+    const isActive = player.activePetInstanceId === inst.instanceId;
+    const statLines = Object.entries(pet.statBuff).map(([k,v])=>`${k.toUpperCase()} +${Math.round(v*100)}%`).join(', ');
+    const extra = [
+      pet.periodicBuff ? '주기 버프' : null,
+      pet.combatHelper ? '⚔️ 전투 지원' : null,
+      pet.reviveChance>0 ? `부활 ${Math.round(pet.reviveChance*100)}%` : null,
+    ].filter(Boolean).join(' · ');
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:${isActive?'rgba(255,215,0,.1)':'rgba(255,255,255,.04)'}; border-radius:8px; border:1px solid ${isActive?PET_RARITY_COLORS[pet.rarity]:'transparent'};">
+      <div>
+        <div>${pet.icon} <b style="color:${PET_RARITY_COLORS[pet.rarity]};">[${PET_RARITY_NAMES[pet.rarity]}]</b> ${pet.name}</div>
+        <div style="font-size:11px; color:var(--ink-dim); margin-top:2px;">${statLines}${extra?' · '+extra:''}</div>
+      </div>
+      <button class="btn small" ${isActive?'disabled style="opacity:.5;"':''} onclick="selectActivePet('${inst.instanceId}')">${isActive?'데리고 있음':'선택'}</button>
+    </div>`;
+  }).join('');
+}
+function selectActivePet(instanceId){
+  player.activePetInstanceId = instanceId;
+  recalcEquippedStats();
+  refreshHUD();
+  renderPetRoom();
+}
+document.getElementById('petRoomCloseBtn').onclick = ()=>{
+  document.getElementById('petRoomOverlay').classList.add('hidden');
+};
+function buyPetFood(foodId){
+  const food = PET_FOOD_TYPES.find(f=>f.id===foodId);
+  if(!food || (player.gold||0) < food.price) return;
+  player.gold -= food.price;
+  if(!player.petFoodInventory) player.petFoodInventory=[];
+  const existing = player.petFoodInventory.find(f=>f.id===foodId);
+  if(existing) existing.count++;
+  else player.petFoodInventory.push({id:foodId, count:1});
+  spawnFloatText(player.x, player.y-60, `${food.icon} ${food.name} 구매!`, '#ffd35c');
+  refreshHUD();
+  renderPetFoodShop();
+}
+function renderPetFoodShop(){
+  document.getElementById('petFoodShopList').innerHTML = PET_FOOD_TYPES.map(food=>{
+    const canAfford = (player.gold||0) >= food.price;
+    const owned = (player.petFoodInventory||[]).find(f=>f.id===food.id);
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(255,255,255,.04); border-radius:8px;">
+      <div>${food.icon} ${food.name} ${owned?`(보유 ${owned.count}개)`:''}</div>
+      <button class="btn small" ${canAfford?'':'disabled style="opacity:.4;"'} onclick="buyPetFood('${food.id}')">${food.price}G 구매</button>
+    </div>`;
+  }).join('');
+}
+function buyEgg(eggId){
+  const egg = EGG_TYPES.find(e=>e.id===eggId);
+  if(!egg || (player.gold||0) < egg.price) return;
+  player.gold -= egg.price;
+  if(!player.eggInventory) player.eggInventory=[];
+  const existing = player.eggInventory.find(e=>e.id===eggId);
+  if(existing) existing.count++;
+  else player.eggInventory.push({id:eggId, count:1});
+  spawnFloatText(player.x, player.y-60, `${egg.icon} ${egg.name} 구매!`, '#ffd35c');
+  refreshHUD();
+  renderShopBuyList();
+  renderInventoryPanel();
+}
+const INCUBATOR_UNLOCK_COST = [0, 15000, 40000];
+function getIncubationTime(eggId){
+  const eggIdx = EGG_TYPES.findIndex(e=>e.id===eggId);
+  return 30 + Math.max(0,eggIdx)*60; // 일반 30초, 등급 한 단계당 +60초
+}
+function ensureIncubators(){
+  if(!player.incubators){
+    player.incubators = [
+      {unlocked:true, eggId:null, doneAt:null},
+      {unlocked:false, eggId:null, doneAt:null},
+      {unlocked:false, eggId:null, doneAt:null},
+    ];
+  }
+}
+function startIncubating(slotIdx, eggId){
+  ensureIncubators();
+  const slot = player.incubators[slotIdx];
+  if(!slot || !slot.unlocked || slot.eggId) return;
+  const eggItem = (player.eggInventory||[]).find(e=>e.id===eggId);
+  if(!eggItem || eggItem.count<=0) return;
+  eggItem.count--;
+  if(eggItem.count<=0) player.eggInventory = player.eggInventory.filter(e=>e!==eggItem);
+  slot.eggId = eggId;
+  slot.doneAt = performance.now()/1000 + getIncubationTime(eggId);
+  renderPetRoom();
+  renderInventoryPanel();
+}
+function collectIncubatedPet(slotIdx){
+  ensureIncubators();
+  const slot = player.incubators[slotIdx];
+  if(!slot || !slot.eggId) return;
+  const now = performance.now()/1000;
+  if(now < slot.doneAt) return;
+  const egg = EGG_TYPES.find(e=>e.id===slot.eggId);
+  const pet = rollPetFromEgg(egg);
+  if(!player.petCollection) player.petCollection=[];
+  const petInstanceId = pet.id+'_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+  player.petCollection.push({instanceId:petInstanceId, petId:pet.id});
+  if(!player.activePetInstanceId) player.activePetInstanceId = petInstanceId;
+  spawnFloatText(player.x, player.y-70, `${pet.icon} [${PET_RARITY_NAMES[pet.rarity]}] ${pet.name} 부화!`, PET_RARITY_COLORS[pet.rarity]);
+  slot.eggId = null;
+  slot.doneAt = null;
+  refreshHUD();
+  renderPetRoom();
+}
+function unlockIncubatorSlot(slotIdx){
+  ensureIncubators();
+  const slot = player.incubators[slotIdx];
+  const cost = INCUBATOR_UNLOCK_COST[slotIdx];
+  if(!slot || slot.unlocked || (player.gold||0) < cost) return;
+  player.gold -= cost;
+  slot.unlocked = true;
+  spawnFloatText(player.x, player.y-60, `🔥 인큐베이터 ${slotIdx+1}번 해금!`, '#ffd35c');
+  refreshHUD();
+  renderPetRoom();
+}
+function putEggInFirstEmptySlot(eggId){
+  ensureIncubators();
+  const idx = player.incubators.findIndex(s=>s.unlocked && !s.eggId);
+  if(idx===-1) return;
+  startIncubating(idx, eggId);
+}
+function renderIncubators(){
+  ensureIncubators();
+  const now = performance.now()/1000;
+  const el = document.getElementById('incubatorList');
+  el.innerHTML = player.incubators.map((slot,idx)=>{
+    if(!slot.unlocked){
+      const cost = INCUBATOR_UNLOCK_COST[idx];
+      const canAfford = (player.gold||0) >= cost;
+      return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(255,255,255,.03); border-radius:8px; opacity:.7;">
+        <div>🔒 인큐베이터 ${idx+1}번 (잠김)</div>
+        <button class="btn small" ${canAfford?'':'disabled style="opacity:.4;"'} onclick="unlockIncubatorSlot(${idx})">${cost}G로 해금</button>
+      </div>`;
+    }
+    if(!slot.eggId){
+      return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(255,255,255,.04); border-radius:8px;">
+        <div>🔥 인큐베이터 ${idx+1}번 (비어있음)</div>
+        <span style="color:var(--ink-dim); font-size:11px;">아래에서 알을 골라 넣어주세요</span>
+      </div>`;
+    }
+    const egg = EGG_TYPES.find(e=>e.id===slot.eggId);
+    const remain = Math.max(0, slot.doneAt-now);
+    const ready = remain<=0;
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:${ready?'rgba(255,215,0,.1)':'rgba(255,255,255,.04)'}; border-radius:8px;">
+      <div>${egg.icon} ${egg.name} 부화 중... ${ready?'완료!':Math.ceil(remain)+'초 남음'}</div>
+      <button class="btn small" ${ready?'':'disabled style="opacity:.4;"'} onclick="collectIncubatedPet(${idx})">${ready?'수확하기':'대기 중'}</button>
+    </div>`;
+  }).join('');
+}
+function buyDimensionCompass(){
+  if(player.dimensionCompassOwned || (player.gold||0) < 5000) return;
+  player.gold -= 5000;
+  player.dimensionCompassOwned = true;
+  spawnFloatText(player.x, player.y-60, '🧭 차원의 나침반을 얻었다! 차원의 균열이 나타나면 알려줘요', '#8a5cff');
   refreshHUD();
   renderShopBuyList();
 }
@@ -7435,6 +7965,19 @@ function tickPocketDimension(dt){
     }
   }
 }
+function drawPetNpc(en){
+  const sx = en.x-camera.x, sy = en.y-camera.y;
+  if(sx<-60||sx>canvas.width+60||sy<-60||sy>canvas.height+60) return;
+  const bob = Math.sin(performance.now()/500 + en.x)*3;
+  ctx.save();
+  ctx.font='34px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(en.icon, sx, sy+bob);
+  ctx.restore();
+  ctx.save();
+  ctx.font='11px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#fff';
+  ctx.fillText(en.name, sx, sy-24);
+  ctx.restore();
+}
 function tickWarderBarriers(dt){
   const now = performance.now()/1000;
   const barriers = entities.filter(e=>e.isWarderBarrier && e.alive);
@@ -7577,6 +8120,10 @@ function tickDimensionRift(dt){
     player.dimensionRiftActive = true;
     player.dimensionRiftUntil = now + 60;
     spawnFloatText(player.x, player.y-100, '🕳️ 세계 곳곳에 차원의 균열이 나타났다...!', '#8a5cff');
+    if(player.dimensionCompassOwned){
+      const qualifies = DIMENSION_RIFT_ZONES.includes(currentZone.id);
+      spawnFloatText(player.x, player.y-130, qualifies ? `🧭 차원의 균열이 ${currentZone.name}에 나타났다!` : '🧭 차원의 균열이 세계 어딘가에 나타났다! (마을·사냥터·낚시터·아틀란티스 확인)', '#4a90ff');
+    }
   }
   const qualifies = DIMENSION_RIFT_ZONES.includes(currentZone.id);
   const existing = entities.find(e=>e.isDimensionRift);
@@ -7687,6 +8234,11 @@ function updateSpirits(dt){
       continue;
     }
     s.tickTimer = (s.tickTimer||0) - dt;
+    if(s.passive){
+      const dxp=player.x-s.x, dyp=player.y-s.y, dp=Math.hypot(dxp,dyp);
+      if(dp>s.followDist){ s.x += (dxp/dp)*s.spd*dt; s.y += (dyp/dp)*s.spd*dt; }
+      continue;
+    }
     // 근처(플레이어 기준) 적 탐색
     let target=null, bd=Infinity;
     if(s.independentHunt){
@@ -8287,6 +8839,19 @@ function spawnZoneEntities(zone){
       home:{x:SKY_RETURN_PORTAL_POS.x, y:SKY_RETURN_PORTAL_POS.y},
     });
   }
+  if(zone.id==='pet_room'){
+    (player.petCollection||[]).forEach((inst,i)=>{
+      const pet = PET_TYPES.find(p=>p.id===inst.petId);
+      if(!pet) return;
+      const x = 150+Math.random()*(zone.size.w-300), y = 150+Math.random()*(zone.size.h-300);
+      entities.push({
+        kind:'petnpc', alive:true, instanceId:inst.instanceId, petId:inst.petId,
+        x, y, home:{x,y},
+        wanderTargetX:x, wanderTargetY:y, wanderPauseUntil: performance.now()/1000 + Math.random()*3,
+        icon:pet.icon, name:pet.name,
+      });
+    });
+  }
   if(zone.id==='muryeongdowon_arena'){
     entities.push({
       kind:'portal', isMuryeongdowonReturnPortal:true, alive:true,
@@ -8653,6 +9218,7 @@ function update(dt){
     nearFarmer = world1BuildingsActive && Math.hypot(player.x-FARMER_POS.x, player.y-FARMER_POS.y) < 70;
     nearTownFishingPortal = world1BuildingsActive && Math.hypot(player.x-TOWN_FISHING_PORTAL_POS.x, player.y-TOWN_FISHING_PORTAL_POS.y) < 70;
     nearMountShop = world1BuildingsActive && Math.hypot(player.x-MOUNT_SHOP_POS.x, player.y-MOUNT_SHOP_POS.y) < 70;
+    nearPetRoomBuilding = world1BuildingsActive && Math.hypot(player.x-PET_ROOM_POS.x, player.y-PET_ROOM_POS.y) < 70;
     nearWorld2Shop = player.currentWorld===2 && Math.hypot(player.x-WORLD2_SHOP_POS.x, player.y-WORLD2_SHOP_POS.y) < 70;
     nearHackerRift = player.hackerGlitchTriggered && !(player.hiddenUnlocked && player.hiddenUnlocked.hacker) && Math.hypot(player.x-HACKER_RIFT_POS.x, player.y-HACKER_RIFT_POS.y) < 70;
     nearImugiCompanion = player.imugiCompanion && player.currentWorld===2 && Math.hypot(player.x-IMUGI_COMPANION_TOWN_POS.x, player.y-IMUGI_COMPANION_TOWN_POS.y) < 70;
@@ -8675,6 +9241,7 @@ function update(dt){
     nearFarmer = false;
     nearTownFishingPortal = false;
     nearMountShop = false;
+    nearPetRoomBuilding = false;
     nearTownNpc = null;
     nearWorld2Shop = false;
     nearHackerRift = false;
@@ -8694,6 +9261,8 @@ function update(dt){
   nearDimensionRift = !!riftEn2 && Math.hypot(player.x-riftEn2.x, player.y-riftEn2.y) < 70;
   const dwPortal2 = entities.find(e=>e.isDimensionWalkerPortal && Math.hypot(player.x-e.x, player.y-e.y) < 70);
   nearDimensionWalkerPortal = dwPortal2 || null;
+  const petNpcNear = currentZone.id==='pet_room' ? entities.find(e=>e.kind==='petnpc' && Math.hypot(player.x-e.x, player.y-e.y) < 65) : null;
+  nearPetNpc = petNpcNear || null;
   if(currentZone.id==='plains'){
     const sp = entities.find(e=>e.kind==='portal' && e.isSecret);
     nearSecretPortal = sp && Math.hypot(player.x-sp.x, player.y-sp.y) < 70;
@@ -8978,6 +9547,7 @@ function update(dt){
   tickDimensionGates(dt);
   tickWarderBarriers(dt);
   tickPocketDimension(dt);
+  tickActivePet(dt);
   markExplored(currentZone.id, player.x, player.y, 420);
   checkSubareaTransition();
   if(getEffectiveBoss(currentZone)){
@@ -8996,10 +9566,34 @@ function update(dt){
   entities.forEach(en=>{
    try{
     if(en.kind==='portal') return; // 포탈은 전투 AI 대상 아님
+    if(en.kind==='petnpc'){
+      const now9 = performance.now()/1000;
+      if(now9 < en.wanderPauseUntil) return;
+      const dx9 = en.wanderTargetX-en.x, dy9 = en.wanderTargetY-en.y;
+      const d9 = Math.hypot(dx9,dy9);
+      if(d9<8){
+        if(Math.random()<0.4){
+          en.wanderPauseUntil = now9 + 2+Math.random()*4; // 잠시 멈춤
+        }
+        en.wanderTargetX = en.home.x + (Math.random()-0.5)*300;
+        en.wanderTargetY = en.home.y + (Math.random()-0.5)*300;
+      } else {
+        const spd9 = 40;
+        en.x += (dx9/d9)*spd9*dt;
+        en.y += (dy9/d9)*spd9*dt;
+      }
+      return;
+    }
     if(en.kind==='resource'){
       if(!en.alive && en.respawnAt!=null && nowT>=en.respawnAt){
-        en.x = 60+Math.random()*(currentZone.size.w-120);
-        en.y = 60+Math.random()*(currentZone.size.h-120);
+        const oldX = en.x, oldY = en.y;
+        let nx, ny, tries=0;
+        do{
+          nx = 60+Math.random()*(currentZone.size.w-120);
+          ny = 60+Math.random()*(currentZone.size.h-120);
+          tries++;
+        } while(Math.hypot(nx-oldX, ny-oldY) < 500 && tries<20);
+        en.x = nx; en.y = ny;
         en.alive = true;
         en.hitsLeft = en.maxHits;
         en.respawnAt = null;
@@ -9181,16 +9775,33 @@ function gamblerEffectSum(type){
   const nowT = performance.now()/1000;
   return player.gamblerEffects.filter(e=>e.type===type && e.expiresAt>nowT).reduce((s,e)=>s+e.amount,0);
 }
+function checkChessDirectionalCrit(target){
+  if(player.classId!=='chess_gamer') return false;
+  const rank = CHESS_RANKS[getChessRank()];
+  if(!rank.meleePattern) return false;
+  if(rank.meleePattern==='all') return true;
+  const dx = target.x-player.x, dy = target.y-player.y;
+  const angleToTarget = Math.atan2(dy,dx);
+  const facingAngle = Math.atan2(player.dir.y||0, player.dir.x||1);
+  let diff = Math.abs(angleToTarget-facingAngle);
+  if(diff>Math.PI) diff = Math.PI*2-diff;
+  const deg = diff*180/Math.PI;
+  if(rank.meleePattern==='diagonal') return Math.abs(deg-45)<20;
+  if(rank.meleePattern==='orthogonal') return (deg<20) || Math.abs(deg-90)<20 || Math.abs(deg-180)<20;
+  return false;
+}
 function computeDamage(mult, target){
   const masteryMult = player.classId==='swordsman' ? (1 + Math.min(player.swordMastery||0, swordMasteryCap())*0.01) : 1;
   const gamblerAtkMult = 1 + gamblerEffectSum('atk');
   const berserkMult = (player.awakened && player.pathId==='berserker') ? (1 + (1-player.hp/player.stats.hp)*1.0) : 1;
   const hwaryongpaMult = (player.awakened && player.pathId==='hwaryongpa') ? 1.5 : 1;
   const rainAtkDebuff = (currentZone.id==='foxden' && foxdenRaining) ? 0.85 : 1;
-  const atkStat = player.stats.atk * (buffs.atk?1+buffs.atk:1) * masteryMult * gamblerAtkMult * berserkMult * hwaryongpaMult * rainAtkDebuff;
+  const chessCritMult = checkChessDirectionalCrit(target) ? 1.8 : 1;
+  const atkStat = player.stats.atk * (buffs.atk?1+buffs.atk:1) * masteryMult * gamblerAtkMult * berserkMult * hwaryongpaMult * rainAtkDebuff * chessCritMult;
   const rawDef = target.def || 0;
   const mitigated = atkStat*mult - rawDef*0.6;
   const floor = atkStat*mult*0.3; // 방어력이 아무리 높아도 최소 30%는 관통
+  if(chessCritMult>1) spawnFloatText(target.x, target.y-30, '♟️ 크리티컬!', '#ffd35c');
   return Math.max(1, Math.round(Math.max(mitigated, floor)));
 }
 // 스킬 고유 효과: 치명타류는 데미지 자체를 키우고(사전 적용), 그 외에는 명중 후 상태이상을 건다.
@@ -10333,7 +10944,47 @@ function trySkill(slot){
   }
   const now = performance.now()/1000;
 
-  if(skill.kind==='warder_barrier'){
+  if(skill.kind==='king_summon'){
+    for(let i=0;i<2;i++){
+      spirits.push({
+        spiritId:'king_pawn_'+i, icon:'♟️', color:'#d8d8d8',
+        x: player.x + (Math.random()-0.5)*60, y: player.y - 20 - i*10,
+        expiresAt: now + skill.dur, tickInterval: 1.0, tickTimer:0,
+        mult: 1.4, range: 160, followDist: 50,
+        spd: 220, hasHp: true, hp: Math.round(player.stats.hp*0.4), hpMax: Math.round(player.stats.hp*0.4),
+      });
+    }
+    player.kingModeUntil = now + skill.dur;
+    spawnFloatText(player.x, player.y-70, '♚ 잠시 킹이 되어 기물을 소환했다!', '#ffd700');
+  } else if(skill.kind==='knight_leap_dmg'){
+    const dirX = player.dir.x||0, dirY = player.dir.y||0;
+    const mag = Math.hypot(dirX,dirY)||1;
+    const fx = dirX/mag, fy = dirY/mag;
+    const sx = -fy, sy = fx;
+    const side = Math.random()<0.5 ? 1 : -1;
+    const cellSize = 55;
+    const targetX = player.x + fx*cellSize*2 + sx*cellSize*side;
+    const targetY = player.y + fy*cellSize*2 + sy*cellSize*side;
+    player.x = Math.max(20, Math.min(currentZone.size.w-20, targetX));
+    player.y = Math.max(20, Math.min(currentZone.size.h-20, targetY));
+    spawnImpact('♞', player.x, player.y, '#c9a878', true);
+    const target = nearestEnemy(90);
+    if(target){
+      const dmg = computeDamage(skill.mult, target);
+      dealDamage(target, dmg, false, skill.name);
+    }
+  } else if(skill.kind==='dmg_self_buff'){
+    const target = nearestEnemy(skill.range);
+    if(target){
+      const dmg = computeDamage(skill.mult, target);
+      dealDamage(target, dmg, false, skill.name);
+      spawnImpact('⚔️', target.x, target.y, '#ffe17a', true);
+    }
+    buffs.atk = skill.buffAtk; buffs.atkUntil = now + skill.buffDur;
+    player.spdBuffUntil = now + skill.buffDur;
+    player.spdBuff = skill.buffSpd;
+    spawnFloatText(player.x, player.y-60, '♛ 여왕의 축복! (공격력·이동속도 증가)', '#ffe17a');
+  } else if(skill.kind==='warder_barrier'){
     const awakenedBonus = player.awakened ? 1.5 : 1;
     const barrierRadius = skill.radius * awakenedBonus;
     const barrierDur = skill.dur * (player.awakened ? 1.2 : 1);
@@ -10975,6 +11626,18 @@ function onEnemyKilled(target){
   }
   const exp = target.kind==='boss' ? target.expReward : Math.round(target.t.exp);
   gainGamerXp(target.kind==='boss' ? 50 : 2);
+  if(player.classId==='chess_gamer'){
+    const prevRank = getChessRank();
+    player.chessXp = Math.min(CHESS_XP_MAX, (player.chessXp||0) + (target.kind==='boss' ? 60 : 4));
+    if(getChessRank() !== prevRank){
+      const newRank = CHESS_RANKS[getChessRank()];
+      spawnFloatText(player.x, player.y-100, `${newRank.icon} ${newRank.name}(으)로 승급!`, newRank.id==='queen' ? '#ffd700' : '#ffd35c');
+      if(newRank.id==='queen') spawnFloatText(player.x, player.y-125, '♛ 여왕의 위엄! 전체 스펙 증가!', '#ffd700');
+      const cls = getPlayerClass();
+      player.baseStats = scaleStatsToLevel(cls.base, player.level, true);
+      recalcEquippedStats();
+    }
+  }
   grantExpByContribution(target, exp);
   const nowT = performance.now()/1000;
   if(player.classId==='swordsman'){
@@ -11249,6 +11912,18 @@ function gainExp(exp){
 }
 
 function onPlayerDeath(){
+  const inst = player.activePetInstanceId && player.petCollection ? player.petCollection.find(p=>p.instanceId===player.activePetInstanceId) : null;
+  const pet = inst ? PET_TYPES.find(p=>p.id===inst.petId) : null;
+  const now = performance.now()/1000;
+  if(pet && pet.reviveChance>0 && (!player.petReviveCdUntil || now>=player.petReviveCdUntil)){
+    if(Math.random() < pet.reviveChance){
+      player.hp = Math.round(player.stats.hp*0.4);
+      player.petReviveCdUntil = now + 300; // 5분 쿨타임
+      spawnFloatText(player.x, player.y-80, `${pet.icon} ${pet.name}이(가) 당신을 살렸다!`, PET_RARITY_COLORS[pet.rarity]);
+      refreshHUD();
+      return;
+    }
+  }
   if(currentZone.id==='fractured_dimension'){
     spawnFloatText(player.x, player.y-60, '💀 쓰러졌다... 잠시 후 다시 일어난다 (차원을 벗어날 수 없다)', '#8a5cff');
     setTimeout(()=>{
@@ -11977,6 +12652,16 @@ function mpBroadcastMove(dt){
     mechActive: !!(player.mechScaleUntil && nowT2<player.mechScaleUntil),
     pvpEnabled: player.pvpEnabled||false,
     pocketDimActive: !!(player.pocketDimensionUntil && nowT2 < player.pocketDimensionUntil),
+    activePetIcon: (()=>{
+      const inst = player.activePetInstanceId && player.petCollection ? player.petCollection.find(p=>p.instanceId===player.activePetInstanceId) : null;
+      const pet = inst ? PET_TYPES.find(p=>p.id===inst.petId) : null;
+      return pet ? pet.icon : null;
+    })(),
+    activePetName: (()=>{
+      const inst = player.activePetInstanceId && player.petCollection ? player.petCollection.find(p=>p.instanceId===player.activePetInstanceId) : null;
+      if(!inst) return null;
+      return (player.petNames||{})[inst.instanceId] || (PET_TYPES.find(p=>p.id===inst.petId)||{}).name || null;
+    })(),
   });
 }
 function drawOtherPlayerAsFigure(p){
@@ -12009,6 +12694,22 @@ function drawOtherPlayers(){
   Object.values(otherPlayers).forEach(p=>{
     if(p.zone !== currentZone.id) return;
     if(p.pocketDimActive) return;
+    if(p.activePetIcon){
+      const psx = p.x-camera.x, psy = p.y-camera.y-45;
+      if(psx>-60 && psx<canvas.width+60 && psy>-60 && psy<canvas.height+60){
+        const bobP = Math.sin(performance.now()/500 + p.x)*3;
+        ctx.save();
+        ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(p.activePetIcon, psx, psy+bobP);
+        ctx.restore();
+        if(p.activePetName){
+          ctx.save();
+          ctx.font='10px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#fff';
+          ctx.fillText(p.activePetName, psx, psy-16);
+          ctx.restore();
+        }
+      }
+    }
     const sx = p.x-camera.x, sy = p.y-camera.y;
     if(sx<-80||sx>canvas.width+80||sy<-80||sy>canvas.height+80) return;
     if(p.classId){
@@ -12501,6 +13202,7 @@ function render(){
     else if(en.kind==='portal' && en.isDimensionGate){ drawDimensionWalkerPortal(en); }
     else if(en.kind==='portal' && en.isDimensionWalkerPortal){ drawDimensionWalkerPortal(en); }
     else if(en.kind==='portal' && en.isWarderBarrier){ drawWarderBarrier(en); }
+    else if(en.kind==='petnpc'){ drawPetNpc(en); }
     else if(en.kind==='portal' && en.isCosmeticRift){ drawCosmeticGlitchRift(en); }
     else if(en.kind==='portal' && en.isAtlantisGate){ drawAtlantisGate(en); }
     else if(en.kind==='portal' && en.isFarmerNPC){ drawFarmerNPCFigure(en); }
@@ -12832,6 +13534,16 @@ function drawDecor(d){
     ctx.fillStyle='#3a2a18'; ctx.fillRect(sx-8, sy+2, 16, 22);
     ctx.font='24px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('🐴', sx, sy-26);
+  } else if(d.type==='petroom'){
+    ctx.save(); ctx.globalAlpha=.3; ctx.fillStyle='#000';
+    ctx.beginPath(); ctx.ellipse(sx, sy+30, 42, 11, 0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.fillStyle='#8a6a4a'; ctx.fillRect(sx-34, sy-14, 68, 38);
+    ctx.strokeStyle='#4a3520'; ctx.lineWidth=2; ctx.strokeRect(sx-34, sy-14, 68, 38);
+    ctx.fillStyle='#6a4a30';
+    ctx.beginPath(); ctx.moveTo(sx-40, sy-14); ctx.lineTo(sx, sy-36); ctx.lineTo(sx+40, sy-14); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#3a2a18'; ctx.fillRect(sx-8, sy+2, 16, 22);
+    ctx.font='24px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🐶', sx, sy-26);
   }
 }
 function drawTownNPC(n){
@@ -13819,6 +14531,12 @@ function drawSpirits(){
       ctx.restore();
     }
 
+    if(s.petName){
+      ctx.save();
+      ctx.font='11px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#fff';
+      ctx.fillText(s.petName, sx, sy+bob-iconSize*0.62-4);
+      ctx.restore();
+    }
     if(big){
       ctx.save();
       ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#ffd35c';
