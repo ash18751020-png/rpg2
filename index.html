@@ -17351,6 +17351,37 @@ function mpConnect(){
       buffType:data.buffType, amount:data.amount, zoneColor:data.zoneColor, icon:data.icon,
     });
   });
+  mpSocket.on('feastZonePlaced', (data)=>{
+    if(!currentZone || currentZone.id!==data.zone) return;
+    entities = entities.filter(e=>!(e.isFeastZone && e.ownerId===data.ownerId));
+    entities.push({
+      kind:'portal', isFeastZone:true, alive:true, ownerId:data.ownerId,
+      x:data.x, y:data.y, radius:data.radius, expiresAt: performance.now()/1000+data.dur,
+    });
+    spawnFloatText(data.x, data.y-80, '🍽️ 만찬시간이 시작되었다!', '#ffb14e');
+  });
+  mpSocket.on('pocketDimensionToggle', (data)=>{
+    if(otherPlayers[data.fromId]) otherPlayers[data.fromId].pocketDimActive = !!data.active;
+  });
+  mpSocket.on('hackerSupport', (data)=>{
+    const now = performance.now()/1000;
+    if(data.type==='resetCooldown'){
+      cooldowns.q = 0; cooldowns.e = 0; cooldowns.r = 0; cooldowns.g = 0;
+      spawnFloatText(player.x, player.y-60, `⏱️ ${data.fromName}이(가) 쿨타임을 초기화해줬다!`, '#39ff14');
+    } else if(data.type==='fullHeal'){
+      player.hp = player.stats.hp;
+      spawnFloatText(player.x, player.y-60, `❤️ ${data.fromName}이(가) 체력을 회복해줬다!`, '#39ff14');
+    } else if(data.type==='clearDebuff'){
+      player.slowUntil = 0; player.stunnedUntil = 0; player.dot = null;
+      spawnFloatText(player.x, player.y-60, `✨ ${data.fromName}이(가) 디버프를 제거해줬다!`, '#39ff14');
+    } else if(data.type==='timeAccel'){
+      player.timeAccelUntil = now + 10;
+      player.spdBuff = Math.max(player.spdBuff||0, 0.4);
+      player.spdBuffUntil = Math.max(player.spdBuffUntil||0, now + 10);
+      spawnFloatText(player.x, player.y-60, `⏩ ${data.fromName}이(가) 시간을 가속해줬다! (10초)`, '#39ff14');
+    }
+    refreshHUD();
+  });
   mpSocket.on('warderShieldCast', (data)=>{
     if(!currentZone || currentZone.id!==data.zoneId) return;
     if(Math.hypot(player.x-data.x, player.y-data.y) > (data.range||200)) return;
